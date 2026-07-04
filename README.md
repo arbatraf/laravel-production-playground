@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit and Pint. Current routes: `GET /`, `GET /up`.
+Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit and Pint. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
 
 ## About
 
@@ -69,7 +69,7 @@ Delivery is slice-based: each feature combines schema, policy, service/action, A
 ## Planned Interfaces
 
 - Backoffice: `/backoffice` after the MoonShine 4 slice.
-- API: `/api/v1` after the API foundation slice.
+- API: `/api/v1` starts with public health/readiness endpoints. Business endpoints arrive after the API foundation slice.
 - Demo users: Admin, Manager and Viewer after the operations core slice.
 
 ## Local Development
@@ -117,6 +117,7 @@ Current coverage:
 - Laravel foundation page
 - application name/configuration
 - Laravel health route
+- API health/readiness endpoints
 
 Planned coverage:
 

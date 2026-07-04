@@ -23,6 +23,8 @@ composer run pint:test
 
 - public foundation page loads
 - application name matches the project name
+- Laravel health route is available
+- API health/readiness endpoints report infrastructure status
 
 ## Planned Checks
 
