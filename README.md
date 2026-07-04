@@ -106,9 +106,7 @@ Docker stays optional. Valet and Homebrew remain the primary local path.
 Checks:
 
 ```bash
-composer validate --strict
-php artisan test
-vendor/bin/pint --test
+composer run check
 yarn build
 ```
 

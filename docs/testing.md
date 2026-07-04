@@ -5,10 +5,16 @@ The foundation uses PHPUnit and Laravel Pint.
 ## Current Checks
 
 ```bash
-composer validate --strict
-php artisan test
-vendor/bin/pint --test
+composer run check
 yarn build
+```
+
+Targeted commands:
+
+```bash
+composer run composer:validate
+composer run test
+composer run pint:test
 ```
 
 `phpunit.xml` uses an in-memory SQLite database for tests. Local development uses MySQL through `.env.example`.
