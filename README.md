@@ -4,7 +4,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
-![MoonShine](https://img.shields.io/badge/MoonShine-4-blue)
+![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
 ![Status](https://img.shields.io/badge/status-foundation-lightgrey)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
@@ -14,13 +14,13 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Foundation stage. Current repository: README, custom portfolio license and roadmap. Laravel code, install steps, demo accounts and screenshots are not in the repo yet.
+Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit and Pint. Current routes: `GET /`, `GET /up`.
 
 ## About
 
 The project is shaped around day-to-day operational work: companies, contacts, manager tasks, imports, reports, communications, integrations and payments.
 
-It is inspired by e-commerce, product landing-page businesses, lead-based sales operations and CRM-driven workflows.
+Domain context: e-commerce, product landing pages, lead-based sales operations and CRM workflows.
 
 This is a business-operations demo, not a full CRM, SaaS product, payment system or messenger clone.
 
@@ -31,19 +31,19 @@ Principle: simulated providers are fine; fake architecture is not.
 | Area | Stack |
 | --- | --- |
 | Backend | PHP 8.5, Laravel 13, MySQL |
-| Backoffice UI | MoonShine 4 |
-| Frontend | Blade, Livewire, Alpine.js, Vite |
-| Charts | ApexCharts |
-| Auth | Laravel Sanctum, policies, gates |
-| Async | queues, jobs, events, listeners, scheduler |
-| Quality | PHPUnit, Laravel Pint, PHPStan / Larastan, Playwright |
-| CI/CD | GitHub Actions |
+| Frontend | Blade, Vite, Yarn |
+| Quality | PHPUnit, Laravel Pint |
+| Planned backoffice | MoonShine 4, Livewire, Alpine.js |
+| Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
+| Planned async | queues, jobs, events, listeners, scheduler |
+| Planned reporting | ApexCharts, cached metrics, exports |
+| Planned delivery | PHPStan / Larastan, Playwright, GitHub Actions |
 
 ## Architecture
 
 Business rules stay in Laravel core: models, services, policies, jobs, API resources, events, listeners, console commands and scheduled tasks.
 
-MoonShine 4 stays at the backoffice UI layer: policy-backed resources, forms, filters, query tags, handlers, metrics and operational pages. It keeps routine admin work fast to build while Laravel services, policies and jobs keep the business flow explicit.
+MoonShine 4 will stay at the backoffice UI layer: policy-backed resources, forms, filters, query tags, handlers, metrics and operational pages. Laravel services, policies and jobs own business behavior.
 
 Complex workflows stay outside the UI layer.
 
@@ -51,9 +51,9 @@ Livewire fits task-board movement, import progress and the communication center.
 
 Alpine.js covers small local UI interactions.
 
-Delivery is slice-based: each feature combines schema, policy, service/action, API or MoonShine surface, focused tests and a short documentation note before the next feature starts.
+Delivery is slice-based: each feature combines schema, policy, service/action, API or MoonShine surface and focused tests. Documentation is added only for new decisions or operational details.
 
-## Scope
+## Planned Scope
 
 | Area | Focus |
 | --- | --- |
@@ -66,64 +66,13 @@ Delivery is slice-based: each feature combines schema, policy, service/action, A
 | Metrics | KPI cards, MoonShine index metrics, operations health, import/webhook/payment/communication charts |
 | Delivery | GitHub Actions CI, Playwright smoke workflow, release artifact, deploy dry run |
 
-## API
+## Planned Interfaces
 
-Base path:
-
-```text
-/api/v1
-```
-
-Initial public endpoints:
-
-```text
-GET /api/v1/health
-GET /api/v1/health/readiness
-```
-
-Protected groups:
-
-```text
-/api/v1/companies
-/api/v1/tasks
-/api/v1/reports
-/api/v1/search
-/api/v1/mail
-/api/v1/discussions
-/api/v1/payments
-```
-
-Webhook entry points:
-
-```text
-POST /api/v1/webhooks/telephony/inbound-call
-POST /api/v1/webhooks/messengers/inbound-message
-POST /api/v1/webhooks/payments/provider
-```
-
-API notes: Sanctum token authentication, `X-Request-Id` correlation, named rate limits, stable JSON errors and OpenAPI documentation.
-
-## Backoffice
-
-Backoffice path:
-
-```text
-/backoffice
-```
-
-Demo roles:
-
-| Role | Access |
-| --- | --- |
-| Admin | full demo access |
-| Manager | operational records, reports and safe demo actions |
-| Viewer | read-only access |
-
-Demo accounts come with seeders once the app is in place.
+- Backoffice: `/backoffice` after the MoonShine 4 slice.
+- API: `/api/v1` after the API foundation slice.
+- Demo users: Admin, Manager and Viewer after the operations core slice.
 
 ## Local Development
-
-The Laravel application is not in the repository yet, so there is no runnable setup command at this stage.
 
 Local setup:
 
@@ -137,16 +86,18 @@ Local setup:
 - Sequel Ace
 - Postman
 
-Setup flow once the app is in place:
+Setup flow:
 
 ```bash
 composer install
 yarn install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
+php artisan migrate
 yarn dev
 ```
+
+The default `.env.example` uses MySQL and the local Valet-friendly URL `http://lpp.test`.
 
 Docker stays optional. Valet and Homebrew remain the primary local path.
 
@@ -155,14 +106,21 @@ Docker stays optional. Valet and Homebrew remain the primary local path.
 Checks:
 
 ```bash
+composer validate --strict
 php artisan test
 vendor/bin/pint --test
-vendor/bin/phpstan analyse
 yarn build
-yarn test:e2e
 ```
 
-Coverage:
+PHPStan/Larastan and Playwright will be added when the related slices need them.
+
+Current coverage:
+
+- Laravel foundation page
+- application name/configuration
+- Laravel health route
+
+Planned coverage:
 
 - services and value objects
 - API, policies and webhooks
@@ -173,40 +131,18 @@ Coverage:
 
 ## Documentation
 
-Long-form notes belong in `docs/`:
+Current docs:
 
 - `docs/architecture.md`
-- `docs/api.md`
-- `docs/openapi.yaml`
 - `docs/testing.md`
-- `docs/integrations.md`
-- `docs/security.md`
-- `docs/ci-cd.md`
-- `docs/deployment.md`
-- `docs/environment.md`
-- `docs/demo-data.md`
-- `docs/metrics.md`
-- `docs/performance.md`
-- `docs/adr/*`
 
-Documentation is added with the feature it describes, so the repo does not collect empty architecture files.
-
-## Screenshots
-
-Screenshots come after the first MoonShine pages exist:
-
-- backoffice dashboard
-- manager task board
-- operations health
-- communication center
-- payment flow
-- API/OpenAPI preview
+Feature docs land with their slices.
 
 ## Roadmap
 
 | Phase | Scope |
 | --- | --- |
-| Foundation | README, license, Laravel app, environment example, first ADR, CI baseline |
+| Foundation | README, license, Laravel app, environment example, CI baseline |
 | Operations core | users, roles, companies, contacts, tasks, notes, policies, factories, seeders |
 | Backoffice | MoonShine 4 setup, `/backoffice`, policy-backed resources, handlers, query tags, task board, metrics, SDUI structure demo |
 | API and access | REST API v1, Sanctum, requests, resources, error format, request IDs, rate limits |
