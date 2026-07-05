@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditEvent;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Note;
@@ -25,8 +26,18 @@ class RoleAccessTest extends TestCase
         $task = Task::factory()->for($company)->for($contact)->create();
         $deletableTask = Task::factory()->create();
         $note = Note::factory()->for($task, 'notable')->for($admin, 'author')->create();
+        $auditEvent = AuditEvent::factory()->for($admin, 'user')->forSubject($task)->create();
 
         $this->assertGateMatrix($admin, 'admin', [
+            ['viewAny', AuditEvent::class, true],
+            ['view', $auditEvent, true],
+            ['create', AuditEvent::class, false],
+            ['update', $auditEvent, false],
+            ['delete', $auditEvent, false],
+            ['massDelete', AuditEvent::class, false],
+            ['restore', $auditEvent, false],
+            ['forceDelete', $auditEvent, false],
+
             ['viewAny', User::class, true],
             ['view', $admin, true],
             ['view', $otherUser, true],
@@ -86,8 +97,18 @@ class RoleAccessTest extends TestCase
         $task = Task::factory()->for($company)->for($contact)->create();
         $ownNote = Note::factory()->for($task, 'notable')->for($manager, 'author')->create();
         $otherNote = Note::factory()->for($task, 'notable')->create();
+        $auditEvent = AuditEvent::factory()->for($manager, 'user')->forSubject($task)->create();
 
         $this->assertGateMatrix($manager, 'manager', [
+            ['viewAny', AuditEvent::class, false],
+            ['view', $auditEvent, false],
+            ['create', AuditEvent::class, false],
+            ['update', $auditEvent, false],
+            ['delete', $auditEvent, false],
+            ['massDelete', AuditEvent::class, false],
+            ['restore', $auditEvent, false],
+            ['forceDelete', $auditEvent, false],
+
             ['viewAny', User::class, false],
             ['view', $manager, true],
             ['view', $user, false],
@@ -147,8 +168,18 @@ class RoleAccessTest extends TestCase
         $contact = Contact::factory()->for($company)->create();
         $task = Task::factory()->for($company)->for($contact)->create();
         $note = Note::factory()->for($task, 'notable')->for($viewer, 'author')->create();
+        $auditEvent = AuditEvent::factory()->for($viewer, 'user')->forSubject($task)->create();
 
         $this->assertGateMatrix($viewer, 'viewer', [
+            ['viewAny', AuditEvent::class, false],
+            ['view', $auditEvent, false],
+            ['create', AuditEvent::class, false],
+            ['update', $auditEvent, false],
+            ['delete', $auditEvent, false],
+            ['massDelete', AuditEvent::class, false],
+            ['restore', $auditEvent, false],
+            ['forceDelete', $auditEvent, false],
+
             ['viewAny', User::class, false],
             ['view', $viewer, true],
             ['view', $user, false],
@@ -217,6 +248,8 @@ class RoleAccessTest extends TestCase
 
     public function test_guest_cannot_access_operations_policies(): void
     {
+        $this->assertFalse(Gate::allows('viewAny', AuditEvent::class));
+        $this->assertFalse(Gate::allows('create', AuditEvent::class));
         $this->assertFalse(Gate::allows('viewAny', Company::class));
         $this->assertFalse(Gate::allows('create', Contact::class));
         $this->assertFalse(Gate::allows('viewAny', Task::class));

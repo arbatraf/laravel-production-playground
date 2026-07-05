@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\AuditEvent;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Note;
 use App\Models\Task;
 use App\Models\User;
+use App\Policies\AuditEventPolicy;
 use App\Policies\CompanyPolicy;
 use App\Policies\ContactPolicy;
 use App\Policies\NotePolicy;
@@ -19,6 +21,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Gate::policy(AuditEvent::class, AuditEventPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Company::class, CompanyPolicy::class);
         Gate::policy(Contact::class, ContactPolicy::class);

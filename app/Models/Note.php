@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAuditEvents;
 use Database\Factories\NoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Note extends Model
 {
     /** @use HasFactory<NoteFactory> */
-    use HasFactory, SoftDeletes;
+    use HasAuditEvents, HasFactory, SoftDeletes;
 
     /**
      * @return MorphTo<Model, $this>

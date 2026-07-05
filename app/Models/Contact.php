@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasAuditEvents;
 use Database\Factories\ContactFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Contact extends Model
 {
     /** @use HasFactory<ContactFactory> */
-    use HasFactory, SoftDeletes;
+    use HasAuditEvents, HasFactory, SoftDeletes;
 
     /**
      * @return BelongsTo<Company, $this>

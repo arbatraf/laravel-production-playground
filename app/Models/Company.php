@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\CompanyStatus;
 use App\Enums\CompanyType;
+use App\Models\Concerns\HasAuditEvents;
 use Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Company extends Model
 {
     /** @use HasFactory<CompanyFactory> */
-    use HasFactory, SoftDeletes;
+    use HasAuditEvents, HasFactory, SoftDeletes;
 
     /** @return array<string, string> */
     protected function casts(): array
