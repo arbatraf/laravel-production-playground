@@ -25,7 +25,8 @@ class NotePolicy
 
     public function update(User $user, Note $note): bool
     {
-        return $user->role === UserRole::Admin || $user->is($note->author);
+        return $user->role === UserRole::Admin
+            || ($user->role === UserRole::Manager && $user->is($note->author));
     }
 
     public function delete(User $user, Note $note): bool

@@ -140,6 +140,7 @@ Planned coverage:
 Current docs:
 
 - `docs/architecture.md`
+- `docs/access-control.md`
 - `docs/ci-cd.md`
 - `docs/testing.md`
 
