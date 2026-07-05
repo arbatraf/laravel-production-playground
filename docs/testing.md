@@ -32,7 +32,7 @@ Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when 
 - API health/readiness endpoints report infrastructure status
 - architecture guard suite covers Yarn commands, MoonShine 4 namespaces and debug helpers in production paths
 - foundation E2E smoke covers the home page and API health route through Laravel's local server
-- operations domain tests cover role casts, company/contact/task/note relations, task status transitions, soft deletes, policy matrix and seeders
+- operations domain tests cover role casts, company/contact/task/note relations, task status transitions, soft deletes, policy matrix and deterministic seeders
 
 ## CI
 

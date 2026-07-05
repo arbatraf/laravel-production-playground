@@ -142,6 +142,7 @@ Current docs:
 - `docs/architecture.md`
 - `docs/access-control.md`
 - `docs/ci-cd.md`
+- `docs/demo-data.md`
 - `docs/testing.md`
 
 Feature docs land with their slices.

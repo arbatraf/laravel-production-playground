@@ -9,11 +9,16 @@ use App\Enums\TaskStatus;
 use App\Enums\UserRole;
 use App\Models\Company;
 use App\Models\User;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
+    private const DEMO_PASSWORD_HASH = '$2y$12$rJfU4zp31W7iF7jyZy4X1eyXprArkTboN8oRI4G2AhKJrDcq6QJ3K';
+
+    private const SEEDED_AT = '2026-07-05 09:00:00';
+
     public function run(): void
     {
         $this->seedDemoUsers();
@@ -28,17 +33,17 @@ class DatabaseSeeder extends Seeder
             ['name' => 'Manager', 'email' => 'manager@example.com', 'role' => UserRole::Manager],
             ['name' => 'Viewer', 'email' => 'viewer@example.com', 'role' => UserRole::Viewer],
         ] as $userData) {
-            $user = User::query()->updateOrCreate(
+            DB::table('users')->updateOrInsert(
                 ['email' => $userData['email']],
                 [
                     'name' => $userData['name'],
-                    'password' => Hash::make('password'),
+                    'email' => $userData['email'],
+                    'email_verified_at' => $this->at(self::SEEDED_AT),
+                    'password' => self::DEMO_PASSWORD_HASH,
+                    'role' => $userData['role']->value,
+                    ...$this->timestamps(),
                 ],
             );
-
-            $user->forceFill([
-                'role' => $userData['role'],
-            ])->save();
         }
     }
 
@@ -51,9 +56,10 @@ class DatabaseSeeder extends Seeder
                 'status' => CompanyStatus::Active,
                 'email' => 'ops@acme-logistics.example',
                 'phone' => '+1 555 0101',
+                ...$this->timestamps(),
                 'contacts' => [
-                    ['first_name' => 'Nina', 'last_name' => 'Petrova', 'email' => 'nina@acme-logistics.example', 'phone' => '+1 555 0111', 'position' => 'Operations Manager'],
-                    ['first_name' => 'Roman', 'last_name' => 'Sokolov', 'email' => 'roman@acme-logistics.example', 'phone' => '+1 555 0112', 'position' => 'Account Lead'],
+                    ['first_name' => 'Nina', 'last_name' => 'Petrova', 'email' => 'nina@acme-logistics.example', 'phone' => '+1 555 0111', 'position' => 'Operations Manager', ...$this->timestamps()],
+                    ['first_name' => 'Roman', 'last_name' => 'Sokolov', 'email' => 'roman@acme-logistics.example', 'phone' => '+1 555 0112', 'position' => 'Account Lead', ...$this->timestamps()],
                 ],
             ],
             [
@@ -62,8 +68,9 @@ class DatabaseSeeder extends Seeder
                 'status' => CompanyStatus::Active,
                 'email' => 'hello@moon-rabbit.example',
                 'phone' => '+1 555 0201',
+                ...$this->timestamps(),
                 'contacts' => [
-                    ['first_name' => 'Elena', 'last_name' => 'Volkova', 'email' => 'elena@moon-rabbit.example', 'phone' => '+1 555 0211', 'position' => 'Vendor Manager'],
+                    ['first_name' => 'Elena', 'last_name' => 'Volkova', 'email' => 'elena@moon-rabbit.example', 'phone' => '+1 555 0211', 'position' => 'Vendor Manager', ...$this->timestamps()],
                 ],
             ],
             [
@@ -72,8 +79,9 @@ class DatabaseSeeder extends Seeder
                 'status' => CompanyStatus::Inactive,
                 'email' => 'team@blue-banana.example',
                 'phone' => '+1 555 0301',
+                ...$this->timestamps(),
                 'contacts' => [
-                    ['first_name' => 'Mark', 'last_name' => 'Ivanov', 'email' => 'mark@blue-banana.example', 'phone' => '+1 555 0311', 'position' => 'Partner Contact'],
+                    ['first_name' => 'Mark', 'last_name' => 'Ivanov', 'email' => 'mark@blue-banana.example', 'phone' => '+1 555 0311', 'position' => 'Partner Contact', ...$this->timestamps()],
                 ],
             ],
         ];
@@ -89,6 +97,7 @@ class DatabaseSeeder extends Seeder
 
             if ($company->trashed()) {
                 $company->restore();
+                $company->forceFill($this->timestamps())->save();
             }
 
             foreach ($contacts as $contactData) {
@@ -99,6 +108,7 @@ class DatabaseSeeder extends Seeder
 
                 if ($contact->trashed()) {
                     $contact->restore();
+                    $contact->forceFill($this->timestamps())->save();
                 }
             }
         }
@@ -121,7 +131,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Customer asked for an updated delivery slot.',
                 'status' => TaskStatus::InProgress,
                 'priority' => TaskPriority::High,
-                'due_at' => now()->addDays(2),
+                'due_at' => $this->at('2026-07-08 10:00:00'),
                 'notes' => ['Nina needs an update before Friday.'],
             ],
             [
@@ -131,7 +141,7 @@ class DatabaseSeeder extends Seeder
                 'description' => null,
                 'status' => TaskStatus::Open,
                 'priority' => TaskPriority::Normal,
-                'due_at' => now()->addWeek(),
+                'due_at' => $this->at('2026-07-15 14:00:00'),
                 'notes' => [],
             ],
             [
@@ -141,7 +151,7 @@ class DatabaseSeeder extends Seeder
                 'description' => 'Vendor sent new wholesale rates.',
                 'status' => TaskStatus::Waiting,
                 'priority' => TaskPriority::Normal,
-                'due_at' => now()->addDays(5),
+                'due_at' => $this->at('2026-07-11 11:00:00'),
                 'notes' => ['Elena still needs to send the spreadsheet.'],
             ],
         ] as $taskData) {
@@ -158,6 +168,7 @@ class DatabaseSeeder extends Seeder
                 'description' => $taskData['description'],
                 'priority' => $taskData['priority'],
                 'due_at' => $taskData['due_at'],
+                ...$this->timestamps(),
             ]);
 
             $task->forceFill([
@@ -170,6 +181,7 @@ class DatabaseSeeder extends Seeder
 
             if ($task->trashed()) {
                 $task->restore();
+                $task->forceFill($this->timestamps())->save();
             }
 
             foreach ($notes as $body) {
@@ -179,10 +191,12 @@ class DatabaseSeeder extends Seeder
 
                 $note->forceFill([
                     'author_id' => $manager->id,
+                    ...$this->timestamps(),
                 ])->save();
 
                 if ($note->trashed()) {
                     $note->restore();
+                    $note->forceFill($this->timestamps())->save();
                 }
             }
         }
@@ -193,10 +207,30 @@ class DatabaseSeeder extends Seeder
 
         $companyNote->forceFill([
             'author_id' => $manager->id,
+            ...$this->timestamps(),
         ])->save();
 
         if ($companyNote->trashed()) {
             $companyNote->restore();
+            $companyNote->forceFill($this->timestamps())->save();
         }
+    }
+
+    private function at(string $date): CarbonImmutable
+    {
+        return CarbonImmutable::parse($date);
+    }
+
+    /**
+     * @return array{created_at: CarbonImmutable, updated_at: CarbonImmutable}
+     */
+    private function timestamps(): array
+    {
+        $seededAt = $this->at(self::SEEDED_AT);
+
+        return [
+            'created_at' => $seededAt,
+            'updated_at' => $seededAt,
+        ];
     }
 }

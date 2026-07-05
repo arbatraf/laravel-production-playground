@@ -13,6 +13,7 @@ use App\Models\Note;
 use App\Models\Task;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
@@ -40,6 +41,10 @@ class OperationsSeederTest extends TestCase
         $this->assertSame(CompanyStatus::Inactive, $inactivePartner->status);
         $this->assertSame(TaskStatus::InProgress, $deliveryTask->status);
         $this->assertSame(TaskPriority::High, $deliveryTask->priority);
+        $this->assertSame(
+            '2026-07-08 10:00:00',
+            DB::table('tasks')->where('id', $deliveryTask->id)->value('due_at'),
+        );
         $this->assertSame(2, $customer->contacts()->count());
         $this->assertSame(2, $customer->tasks()->count());
         $this->assertSame(1, $deliveryTask->notes()->count());
@@ -83,5 +88,60 @@ class OperationsSeederTest extends TestCase
         $this->assertSame(4, Contact::withTrashed()->count());
         $this->assertSame(3, Task::withTrashed()->count());
         $this->assertSame(3, Note::withTrashed()->count());
+    }
+
+    public function test_demo_data_stays_stable_between_seed_runs(): void
+    {
+        try {
+            $this->travelTo('2026-08-01 12:00:00');
+            $this->seed();
+
+            $snapshot = $this->demoDataSnapshot();
+
+            $this->travelTo('2026-09-15 18:30:00');
+            $this->seed();
+
+            $this->assertSame($snapshot, $this->demoDataSnapshot());
+            $this->assertSame(
+                '2026-07-11 11:00:00',
+                DB::table('tasks')->where('title', 'Review vendor price list')->value('due_at'),
+            );
+        } finally {
+            $this->travelBack();
+        }
+    }
+
+    /**
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function demoDataSnapshot(): array
+    {
+        return [
+            'users' => DB::table('users')
+                ->orderBy('email')
+                ->get(['name', 'email', 'email_verified_at', 'password', 'role', 'created_at', 'updated_at'])
+                ->map(fn ($row): array => (array) $row)
+                ->all(),
+            'companies' => DB::table('companies')
+                ->orderBy('name')
+                ->get(['name', 'type', 'status', 'email', 'phone', 'created_at', 'updated_at', 'deleted_at'])
+                ->map(fn ($row): array => (array) $row)
+                ->all(),
+            'contacts' => DB::table('contacts')
+                ->orderBy('email')
+                ->get(['first_name', 'last_name', 'email', 'phone', 'position', 'created_at', 'updated_at', 'deleted_at'])
+                ->map(fn ($row): array => (array) $row)
+                ->all(),
+            'tasks' => DB::table('tasks')
+                ->orderBy('title')
+                ->get(['title', 'description', 'status', 'priority', 'due_at', 'completed_at', 'created_at', 'updated_at', 'deleted_at'])
+                ->map(fn ($row): array => (array) $row)
+                ->all(),
+            'notes' => DB::table('notes')
+                ->orderBy('body')
+                ->get(['body', 'created_at', 'updated_at', 'deleted_at'])
+                ->map(fn ($row): array => (array) $row)
+                ->all(),
+        ];
     }
 }
