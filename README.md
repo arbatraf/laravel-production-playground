@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-foundation-lightgrey)
+![Status](https://img.shields.io/badge/status-operations--core-lightgrey)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit, Pint, PHPStan/Larastan and GitHub Actions CI. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
+Current stage: operations core. The project has the Laravel 13/PHP 8.5 foundation, CI quality gate, foundation E2E smoke and domain model for users, companies and contacts. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
 
 ## About
 
@@ -32,7 +32,8 @@ Principle: simulated providers are fine; fake architecture is not.
 | --- | --- |
 | Backend | PHP 8.5, Laravel 13, MySQL |
 | Frontend | Blade, Vite, Yarn |
-| Quality | PHPUnit, Laravel Pint, PHPStan/Larastan level 6 |
+| Quality | PHPUnit, Node test, Laravel Pint, PHPStan/Larastan level 6 |
+| Operations core | User roles, companies, contacts, policies, factories, seeders |
 | Planned backoffice | MoonShine 4, Livewire, Alpine.js |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
@@ -41,7 +42,7 @@ Principle: simulated providers are fine; fake architecture is not.
 
 ## Architecture
 
-Business rules stay in Laravel core: models, services, policies, jobs, API resources, events, listeners, console commands and scheduled tasks.
+Business rules stay in Laravel core: models, enums, policies, services, jobs, API resources, events, listeners, console commands and scheduled tasks.
 
 MoonShine 4 will stay at the backoffice UI layer: policy-backed resources, forms, filters, query tags, handlers, metrics and operational pages. Laravel services, policies and jobs own business behavior.
 
@@ -70,7 +71,7 @@ Delivery is slice-based: each feature combines schema, policy, service/action, A
 
 - Backoffice: `/backoffice` after the MoonShine 4 slice.
 - API: `/api/v1` starts with public health/readiness endpoints. Business endpoints arrive after the API foundation slice.
-- Demo users: Admin, Manager and Viewer after the operations core slice.
+- Demo users: `admin@example.com`, `manager@example.com`, `viewer@example.com`; password: `password`.
 
 ## Local Development
 
@@ -109,11 +110,12 @@ Checks:
 ```bash
 composer run check
 yarn build
+yarn test:e2e
 ```
 
 CI runs Composer validation, Pint, PHPStan/Larastan level 6, PHPUnit and `yarn build`.
 
-Playwright will be added when browser smoke coverage lands.
+Playwright will be added when browser smoke coverage lands. Current E2E smoke uses Node test.
 
 Current coverage:
 
@@ -121,11 +123,13 @@ Current coverage:
 - application name/configuration
 - Laravel health route
 - API health/readiness endpoints
+- foundation HTTP smoke through Laravel's local server
+- operations model: roles, companies, contacts, policies, factories and seeders
 
 Planned coverage:
 
 - services and value objects
-- API, policies and webhooks
+- API and webhooks
 - imports, payments and communication workflows
 - MoonShine resources, policies, handlers, query tags and metrics
 - Livewire/Alpine backoffice widgets and key smoke paths

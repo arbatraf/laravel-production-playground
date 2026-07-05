@@ -5,7 +5,8 @@
     "packageManager": "yarn@1.22.22",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "test:e2e": "node --test tests/e2e/*.test.mjs"
     },
     "devDependencies": {
         "concurrently": "^9.0.1",
