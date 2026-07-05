@@ -13,6 +13,7 @@ Targeted commands:
 
 ```bash
 composer run composer:validate
+composer run architecture
 composer run test
 composer run pint:test
 composer run analyse
@@ -20,12 +21,15 @@ composer run analyse
 
 `phpunit.xml` uses an in-memory SQLite database for tests. Local development uses MySQL through `.env.example`.
 
+Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when global CLI PHP differs.
+
 ## Current Coverage
 
 - public foundation page loads
 - application name matches the project name
 - Laravel health route is available
 - API health/readiness endpoints report infrastructure status
+- architecture guard suite covers Yarn commands, MoonShine 4 namespaces and debug helpers in production paths
 
 ## CI
 

@@ -1,0 +1,63 @@
+#!/usr/bin/env sh
+set -eu
+
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+PHP_VERSION=""
+
+if [ -f "$ROOT_DIR/.valetphprc" ]; then
+    PHP_VERSION="$(tr -d '[:space:]' < "$ROOT_DIR/.valetphprc")"
+elif [ -f "$ROOT_DIR/.valetrc" ]; then
+    PHP_VERSION="$(awk -F= '
+        {
+            key = $1
+            gsub(/[[:space:]]/, "", key)
+
+            if (tolower(key) == "php") {
+                value = $2
+                gsub(/[[:space:]]/, "", value)
+                print value
+                exit
+            }
+        }
+    ' "$ROOT_DIR/.valetrc")"
+fi
+
+if [ -z "$PHP_VERSION" ]; then
+    PHP_VERSION="php@8.5"
+fi
+
+REQUIRED_MINOR="${PHP_VERSION#php@}"
+PHP_BIN="/opt/homebrew/opt/$PHP_VERSION/bin/php"
+
+php_minor() {
+    "$1" -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;' 2>/dev/null || true
+}
+
+if [ ! -x "$PHP_BIN" ] && command -v brew >/dev/null 2>&1; then
+    BREW_PREFIX="$(brew --prefix "$PHP_VERSION" 2>/dev/null || true)"
+
+    if [ -n "$BREW_PREFIX" ] && [ -x "$BREW_PREFIX/bin/php" ]; then
+        PHP_BIN="$BREW_PREFIX/bin/php"
+    fi
+fi
+
+if [ ! -x "$PHP_BIN" ] && command -v php >/dev/null 2>&1; then
+    PATH_PHP="$(command -v php)"
+
+    if [ "$(php_minor "$PATH_PHP")" = "$REQUIRED_MINOR" ]; then
+        PHP_BIN="$PATH_PHP"
+    fi
+fi
+
+if [ ! -x "$PHP_BIN" ]; then
+    echo "PHP binary not found for $PHP_VERSION." >&2
+    echo "Install $PHP_VERSION with Homebrew or run: valet isolate $PHP_VERSION --site=lpp" >&2
+    exit 1
+fi
+
+if [ "$(php_minor "$PHP_BIN")" != "$REQUIRED_MINOR" ]; then
+    echo "Expected $PHP_VERSION; $PHP_BIN is PHP $(php_minor "$PHP_BIN")." >&2
+    exit 1
+fi
+
+exec "$PHP_BIN" "$@"

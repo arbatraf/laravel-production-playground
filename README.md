@@ -89,15 +89,16 @@ Local setup:
 Setup flow:
 
 ```bash
-composer install
+./scripts/composer install
 yarn install
 cp .env.example .env
-php artisan key:generate
-php artisan migrate
+./scripts/php artisan key:generate
+./scripts/php artisan migrate
 yarn dev
 ```
 
 The default `.env.example` uses MySQL and the local Valet-friendly URL `http://lpp.test`.
+Local CLI PHP is pinned to `php@8.5` in `.valetrc`. Use `./scripts/php` and `./scripts/composer`.
 
 Docker stays optional. Valet and Homebrew remain the primary local path.
 

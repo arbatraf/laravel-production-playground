@@ -40,25 +40,26 @@
     },
     "scripts": {
         "setup": [
-            "\"$PHP_BINARY\" \"$COMPOSER_BINARY\" install",
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-            "@php artisan key:generate",
-            "@php artisan migrate",
+            "./scripts/composer install",
+            "./scripts/php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "./scripts/php artisan key:generate",
+            "./scripts/php artisan migrate",
             "yarn install",
             "yarn build"
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "yarn concurrently -c \"#2563EB,#0F172A,#10B981,#F59E0B\" \"$PHP_BINARY artisan serve\" \"$PHP_BINARY artisan queue:listen --tries=1 --timeout=0\" \"$PHP_BINARY artisan pail --timeout=0\" \"yarn dev\" --names=server,queue,logs,vite --kill-others"
+            "yarn concurrently -c \"#2563EB,#0F172A,#10B981,#F59E0B\" \"./scripts/php artisan serve\" \"./scripts/php artisan queue:listen --tries=1 --timeout=0\" \"./scripts/php artisan pail --timeout=0\" \"yarn dev\" --names=server,queue,logs,vite --kill-others"
         ],
-        "composer:validate": "\"$PHP_BINARY\" \"$COMPOSER_BINARY\" validate --strict",
+        "composer:validate": "\"$COMPOSER_BINARY\" validate --strict",
         "test": [
-            "@php artisan config:clear --ansi @no_additional_args",
-            "@php artisan test"
+            "./scripts/php artisan config:clear --ansi @no_additional_args",
+            "./scripts/php artisan test"
         ],
-        "pint": "@php vendor/bin/pint",
-        "pint:test": "@php vendor/bin/pint --test",
-        "analyse": "@php vendor/bin/phpstan analyse --debug",
+        "architecture": "./scripts/php artisan test --testsuite=Architecture",
+        "pint": "./scripts/php vendor/bin/pint",
+        "pint:test": "./scripts/php vendor/bin/pint --test",
+        "analyse": "./scripts/php vendor/bin/phpstan analyse --debug",
         "check": [
             "@composer:validate",
             "@pint:test",
@@ -67,16 +68,16 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "./scripts/php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "./scripts/php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
         "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+            "./scripts/php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
         "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
+            "./scripts/php artisan key:generate --ansi"
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"

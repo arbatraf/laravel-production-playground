@@ -1,0 +1,16 @@
+#!/usr/bin/env sh
+set -eu
+
+SCRIPT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
+COMPOSER_BIN="${COMPOSER_BINARY:-}"
+
+if [ -z "$COMPOSER_BIN" ]; then
+    COMPOSER_BIN="$(command -v composer || true)"
+fi
+
+if [ -z "$COMPOSER_BIN" ]; then
+    echo "Composer not found in PATH." >&2
+    exit 1
+fi
+
+exec "$SCRIPT_DIR/php" -d "error_reporting=E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED" "$COMPOSER_BIN" "$@"
