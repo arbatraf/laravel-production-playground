@@ -2,7 +2,7 @@
 
 Laravel Production Playground is a portfolio Laravel project for business backoffice workflows. It is not a CRM or SaaS product.
 
-The foundation contains Laravel 13, PHP 8.5, MySQL `.env.example`, Vite through Yarn and PHPUnit checks.
+The foundation contains Laravel 13, PHP 8.5, MySQL `.env.example`, Vite through Yarn, PHPUnit, Pint, PHPStan/Larastan and GitHub Actions CI.
 
 ## Boundaries
 

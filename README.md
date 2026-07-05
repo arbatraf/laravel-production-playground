@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit and Pint. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
+Foundation stage. Installed now: Laravel 13, PHP 8.5, Vite, Yarn, PHPUnit, Pint, PHPStan/Larastan and GitHub Actions CI. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
 
 ## About
 
@@ -32,12 +32,12 @@ Principle: simulated providers are fine; fake architecture is not.
 | --- | --- |
 | Backend | PHP 8.5, Laravel 13, MySQL |
 | Frontend | Blade, Vite, Yarn |
-| Quality | PHPUnit, Laravel Pint |
+| Quality | PHPUnit, Laravel Pint, PHPStan/Larastan level 6 |
 | Planned backoffice | MoonShine 4, Livewire, Alpine.js |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
 | Planned reporting | ApexCharts, cached metrics, exports |
-| Planned delivery | PHPStan / Larastan, Playwright, GitHub Actions |
+| Planned delivery | Playwright, release artifacts, deploy dry run |
 
 ## Architecture
 
@@ -110,7 +110,9 @@ composer run check
 yarn build
 ```
 
-PHPStan/Larastan and Playwright will be added when the related slices need them.
+CI runs Composer validation, Pint, PHPStan/Larastan level 6, PHPUnit and `yarn build`.
+
+Playwright will be added when browser smoke coverage lands.
 
 Current coverage:
 
@@ -133,6 +135,7 @@ Planned coverage:
 Current docs:
 
 - `docs/architecture.md`
+- `docs/ci-cd.md`
 - `docs/testing.md`
 
 Feature docs land with their slices.

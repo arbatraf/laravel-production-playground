@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Services\Health\ReadinessChecker;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 class HealthApiTest extends TestCase
@@ -32,15 +31,20 @@ class HealthApiTest extends TestCase
 
     public function test_readiness_endpoint_returns_unavailable_when_a_check_fails(): void
     {
-        $this->mock(ReadinessChecker::class, function (MockInterface $mock): void {
-            $mock->shouldReceive('run')
-                ->once()
-                ->andReturn([
+        $this->instance(ReadinessChecker::class, new class extends ReadinessChecker
+        {
+            /**
+             * @return array{status: 'not_ready', checks: list<array{name: string, status: 'fail'}>}
+             */
+            public function run(): array
+            {
+                return [
                     'status' => 'not_ready',
                     'checks' => [
                         ['name' => 'database', 'status' => 'fail'],
                     ],
-                ]);
+                ];
+            }
         });
 
         $this->getJson('/api/v1/health/readiness')

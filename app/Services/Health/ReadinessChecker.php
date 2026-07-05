@@ -11,10 +11,17 @@ use Throwable;
 
 class ReadinessChecker
 {
+    /**
+     * @return array{status: 'ready'|'not_ready', checks: list<array{name: string, status: 'pass'|'fail'}>}
+     */
     public function run(): array
     {
         $checks = [
-            $this->check('database', fn (): bool => DB::connection()->getPdo() !== null),
+            $this->check('database', function (): bool {
+                DB::connection()->getPdo();
+
+                return true;
+            }),
             $this->check('cache', fn (): bool => $this->cacheIsWritable()),
             $this->check('storage', fn (): bool => File::isDirectory(storage_path('framework')) && File::isWritable(storage_path('framework'))),
             $this->check('queue', fn (): bool => $this->queueIsConfigured()),
@@ -27,6 +34,9 @@ class ReadinessChecker
         ];
     }
 
+    /**
+     * @return array{name: string, status: 'pass'|'fail'}
+     */
     private function check(string $name, Closure $callback): array
     {
         try {
