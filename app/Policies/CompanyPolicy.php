@@ -45,6 +45,9 @@ class CompanyPolicy
 
     public function forceDelete(User $user, Company $company): bool
     {
-        return $user->role === UserRole::Admin;
+        return $user->role === UserRole::Admin
+            && ! $company->contacts()->withTrashed()->exists()
+            && ! $company->tasks()->withTrashed()->exists()
+            && ! $company->notes()->withTrashed()->exists();
     }
 }

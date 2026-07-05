@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: operations core. The project has the Laravel 13/PHP 8.5 foundation, CI quality gate, foundation E2E smoke and domain model for users, companies and contacts. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
+Current stage: operations core. Laravel 13/PHP 8.5 foundation, CI quality gate, foundation E2E smoke and the users/companies/contacts/tasks/notes domain model are in place. Current routes: `GET /`, `GET /up`, `GET /api/v1/health`, `GET /api/v1/health/readiness`.
 
 ## About
 
@@ -33,7 +33,7 @@ Principle: simulated providers are fine; fake architecture is not.
 | Backend | PHP 8.5, Laravel 13, MySQL |
 | Frontend | Blade, Vite, Yarn |
 | Quality | PHPUnit, Node test, Laravel Pint, PHPStan/Larastan level 6 |
-| Operations core | User roles, companies, contacts, policies, factories, seeders |
+| Operations core | User roles, companies, contacts, tasks, notes, policies, factories, seeders |
 | Planned backoffice | MoonShine 4, Livewire, Alpine.js |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
@@ -124,7 +124,7 @@ Current coverage:
 - Laravel health route
 - API health/readiness endpoints
 - foundation HTTP smoke through Laravel's local server
-- operations model: roles, companies, contacts, policies, factories and seeders
+- operations model: roles, companies, contacts, tasks, notes, policies, factories and seeders
 
 Planned coverage:
 

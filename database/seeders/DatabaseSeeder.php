@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Enums\CompanyStatus;
 use App\Enums\CompanyType;
+use App\Enums\TaskPriority;
+use App\Enums\TaskStatus;
 use App\Enums\UserRole;
 use App\Models\Company;
 use App\Models\User;
@@ -16,6 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->seedDemoUsers();
         $this->seedDemoCompanies();
+        $this->seedDemoTasks();
     }
 
     private function seedDemoUsers(): void
@@ -98,6 +101,102 @@ class DatabaseSeeder extends Seeder
                     $contact->restore();
                 }
             }
+        }
+    }
+
+    private function seedDemoTasks(): void
+    {
+        $admin = User::query()->where('email', 'admin@example.com')->firstOrFail();
+        $manager = User::query()->where('email', 'manager@example.com')->firstOrFail();
+        $acme = Company::query()->where('name', 'Acme Logistics')->firstOrFail();
+        $vendor = Company::query()->where('name', 'Moon Rabbit Supply')->firstOrFail();
+        $customerContact = $acme->contacts()->where('email', 'nina@acme-logistics.example')->firstOrFail();
+        $vendorContact = $vendor->contacts()->where('email', 'elena@moon-rabbit.example')->firstOrFail();
+
+        foreach ([
+            [
+                'company' => $acme,
+                'contact_id' => $customerContact->id,
+                'title' => 'Confirm warehouse delivery window',
+                'description' => 'Customer asked for an updated delivery slot.',
+                'status' => TaskStatus::InProgress,
+                'priority' => TaskPriority::High,
+                'due_at' => now()->addDays(2),
+                'notes' => ['Nina needs an update before Friday.'],
+            ],
+            [
+                'company' => $acme,
+                'contact_id' => null,
+                'title' => 'Check contract renewal date',
+                'description' => null,
+                'status' => TaskStatus::Open,
+                'priority' => TaskPriority::Normal,
+                'due_at' => now()->addWeek(),
+                'notes' => [],
+            ],
+            [
+                'company' => $vendor,
+                'contact_id' => $vendorContact->id,
+                'title' => 'Review vendor price list',
+                'description' => 'Vendor sent new wholesale rates.',
+                'status' => TaskStatus::Waiting,
+                'priority' => TaskPriority::Normal,
+                'due_at' => now()->addDays(5),
+                'notes' => ['Elena still needs to send the spreadsheet.'],
+            ],
+        ] as $taskData) {
+            $notes = $taskData['notes'];
+            $company = $taskData['company'];
+            unset($taskData['notes'], $taskData['company']);
+
+            $task = $company->tasks()->withTrashed()->firstOrNew([
+                'title' => $taskData['title'],
+            ]);
+
+            $task->fill([
+                'title' => $taskData['title'],
+                'description' => $taskData['description'],
+                'priority' => $taskData['priority'],
+                'due_at' => $taskData['due_at'],
+            ]);
+
+            $task->forceFill([
+                'contact_id' => $taskData['contact_id'],
+                'assigned_to_user_id' => $manager->id,
+                'created_by_user_id' => $admin->id,
+                'status' => $taskData['status'],
+                'completed_at' => null,
+            ])->save();
+
+            if ($task->trashed()) {
+                $task->restore();
+            }
+
+            foreach ($notes as $body) {
+                $note = $task->notes()->withTrashed()->firstOrNew([
+                    'body' => $body,
+                ]);
+
+                $note->forceFill([
+                    'author_id' => $manager->id,
+                ])->save();
+
+                if ($note->trashed()) {
+                    $note->restore();
+                }
+            }
+        }
+
+        $companyNote = $acme->notes()->withTrashed()->firstOrNew([
+            'body' => 'Delivery follow-up is active.',
+        ]);
+
+        $companyNote->forceFill([
+            'author_id' => $manager->id,
+        ])->save();
+
+        if ($companyNote->trashed()) {
+            $companyNote->restore();
         }
     }
 }

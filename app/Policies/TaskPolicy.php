@@ -3,17 +3,17 @@
 namespace App\Policies;
 
 use App\Enums\UserRole;
-use App\Models\Contact;
+use App\Models\Task;
 use App\Models\User;
 
-class ContactPolicy
+class TaskPolicy
 {
     public function viewAny(User $user): bool
     {
         return in_array($user->role, [UserRole::Admin, UserRole::Manager, UserRole::Viewer], true);
     }
 
-    public function view(User $user, Contact $contact): bool
+    public function view(User $user, Task $task): bool
     {
         return $this->viewAny($user);
     }
@@ -23,12 +23,12 @@ class ContactPolicy
         return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
     }
 
-    public function update(User $user, Contact $contact): bool
+    public function update(User $user, Task $task): bool
     {
         return in_array($user->role, [UserRole::Admin, UserRole::Manager], true);
     }
 
-    public function delete(User $user, Contact $contact): bool
+    public function delete(User $user, Task $task): bool
     {
         return $user->role === UserRole::Admin;
     }
@@ -38,14 +38,14 @@ class ContactPolicy
         return $user->role === UserRole::Admin;
     }
 
-    public function restore(User $user, Contact $contact): bool
+    public function restore(User $user, Task $task): bool
     {
         return $user->role === UserRole::Admin;
     }
 
-    public function forceDelete(User $user, Contact $contact): bool
+    public function forceDelete(User $user, Task $task): bool
     {
         return $user->role === UserRole::Admin
-            && ! $contact->notes()->withTrashed()->exists();
+            && ! $task->notes()->withTrashed()->exists();
     }
 }

@@ -4,7 +4,7 @@ Laravel Production Playground is a portfolio Laravel project for business backof
 
 The foundation contains Laravel 13, PHP 8.5, MySQL `.env.example`, Vite through Yarn, PHPUnit, Pint, PHPStan/Larastan and GitHub Actions CI.
 
-The operations core contains enum-backed user roles, companies, contacts, factories, seeders and Laravel policies.
+The operations core contains enum-backed user roles, companies, contacts, tasks, notes, factories, seeders and Laravel policies.
 
 ## Boundaries
 
@@ -21,7 +21,9 @@ MoonShine 4 will be the backoffice UI layer. Resources and pages may display dat
 
 Roles are stored as `UserRole` enum values on users. Policies own access decisions; role checks should not spread through controllers, resources or views.
 
-Companies and contacts use soft deletes. Contacts keep their company relation available when a company is archived.
+Companies, contacts, tasks and notes use soft deletes. Contacts keep archived company context. Tasks keep archived company/contact context. Notes may attach to companies, contacts or tasks.
+
+Task status uses `TaskStatus`. `ChangeTaskStatusAction` sets `completed_at` for closed statuses and blocks transitions out of them.
 
 ## Delivery
 
