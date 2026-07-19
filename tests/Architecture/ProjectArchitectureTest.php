@@ -102,7 +102,9 @@ class ProjectArchitectureTest extends TestCase
             }
 
             foreach (self::FORBIDDEN_MOONSHINE_THREE_REFERENCES as $reference) {
-                if (str_contains($content, $reference)) {
+                $pattern = '~(?<![A-Za-z0-9_\\\\])\\\\?'.preg_quote($reference, '~').'~';
+
+                if (preg_match($pattern, $content) === 1) {
                     $violations[] = self::relativePath($file).': uses '.$reference;
                 }
             }

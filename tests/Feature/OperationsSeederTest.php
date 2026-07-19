@@ -12,9 +12,11 @@ use App\Models\Contact;
 use App\Models\Note;
 use App\Models\Task;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use LogicException;
 use Tests\TestCase;
 
 class OperationsSeederTest extends TestCase
@@ -109,6 +111,16 @@ class OperationsSeederTest extends TestCase
         } finally {
             $this->travelBack();
         }
+    }
+
+    public function test_demo_data_is_not_seeded_in_production(): void
+    {
+        $this->app->detectEnvironment(static fn (): string => 'production');
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Demo data is only available in local and testing environments.');
+
+        (new DatabaseSeeder)->run();
     }
 
     /**

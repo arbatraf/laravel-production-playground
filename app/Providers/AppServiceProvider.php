@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\UserRole;
 use App\Models\AuditEvent;
 use App\Models\Company;
 use App\Models\Contact;
@@ -21,6 +22,15 @@ class AppServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        Gate::define(
+            'accessBackoffice',
+            static fn (User $user): bool => in_array($user->role, [
+                UserRole::Admin,
+                UserRole::Manager,
+                UserRole::Viewer,
+            ], true),
+        );
+
         Gate::policy(AuditEvent::class, AuditEventPolicy::class);
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Company::class, CompanyPolicy::class);

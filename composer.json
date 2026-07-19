@@ -15,7 +15,8 @@
     "require": {
         "php": "^8.5",
         "laravel/framework": "^13.8",
-        "laravel/tinker": "^3.0"
+        "laravel/tinker": "^3.0",
+        "moonshine/moonshine": "^4.18"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

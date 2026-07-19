@@ -2,6 +2,8 @@
 
 Laravel policies define role access. Keep role checks out of controllers, resources and views.
 
+Admin, Manager and Viewer may enter `/backoffice`. Resource access remains policy-backed.
+
 ## Roles
 
 - `Admin` manages operations records and users, except bulk or hard user deletion.

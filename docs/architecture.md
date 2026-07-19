@@ -15,7 +15,11 @@ Business behavior stays in Laravel code that can be tested without the admin UI:
 - jobs, events and listeners for asynchronous work
 - API resources and controllers for REST API surfaces
 
-MoonShine 4 will be the backoffice UI layer. Resources and pages may display data, trigger handlers and call Laravel services, but they must not own business workflows.
+MoonShine 4 is the backoffice UI layer at `/backoffice`. It uses a separate session guard with the existing `User` model. Admin, Manager and Viewer may enter the panel; resource policies define record access.
+
+Backoffice login does not create persistent remember-me cookies. Password changes invalidate active backoffice sessions.
+
+MoonShine resources and pages may display data, trigger handlers and call Laravel services, but they must not own business workflows.
 
 ## Operations Core
 

@@ -6,6 +6,8 @@ Seed demo data:
 ./scripts/php artisan migrate --seed
 ```
 
+Demo seeding is limited to local and testing environments.
+
 Reset the local demo database:
 
 ```bash
