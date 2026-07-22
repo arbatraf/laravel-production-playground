@@ -87,6 +87,19 @@ class BackofficeAccessTest extends TestCase
         }
     }
 
+    public function test_backoffice_logo_follows_the_selected_theme(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        $this->actingAs($user, 'backoffice')
+            ->get(route('moonshine.index'))
+            ->assertOk()
+            ->assertSee('/brand/logo.svg#light', false)
+            ->assertSee('/brand/logo.svg#dark', false)
+            ->assertSee('/brand/logo-small.svg#light', false)
+            ->assertSee('/brand/logo-small.svg#dark', false);
+    }
+
     public function test_web_session_does_not_open_backoffice(): void
     {
         $user = User::factory()->admin()->create();

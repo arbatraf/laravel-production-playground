@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-backoffice--foundation-blue)
+![Status](https://img.shields.io/badge/status-backoffice--resources-blue)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: backoffice foundation. Laravel 13/PHP 8.5, MoonShine 4, the CI quality gate and foundation E2E smoke are in place. The operations core covers users, companies, contacts, tasks, notes and audit events.
+Current stage: backoffice resources. Laravel 13/PHP 8.5, MoonShine 4, the CI quality gate and foundation E2E smoke are in place. Policy-backed resources expose users, companies, contacts, tasks, notes and audit events through the backoffice.
 
 Current interfaces: `/`, `/backoffice`, `/api/v1/health`, `/api/v1/health/readiness`.
 
@@ -36,7 +36,7 @@ Principle: simulated providers are fine; fake architecture is not.
 | Frontend | Blade, Vite, Yarn |
 | Quality | PHPUnit, Node test, Laravel Pint, PHPStan/Larastan level 6 |
 | Operations core | User roles, companies, contacts, tasks, notes, audit events, policies, factories, seeders |
-| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users and policies |
+| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users and policy-backed resources |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
 | Planned reporting | ApexCharts, cached metrics, exports |
@@ -128,14 +128,14 @@ Current coverage:
 - foundation HTTP smoke through Laravel's local server
 - operations model: roles, companies, contacts, tasks, notes, policies, factories and seeders
 - audit event writer, task status audit, policy access and soft-deleted subject context
-- MoonShine login, separate backoffice session, role access and branding
+- MoonShine login, separate backoffice session, branding and policy-backed resources for users, companies, contacts, tasks, notes and audit events
 
 Planned coverage:
 
 - services and value objects
 - API and webhooks
 - imports, payments and communication workflows
-- MoonShine resources, policies, handlers, query tags and metrics
+- MoonShine handlers, query tags and metrics
 - Livewire/Alpine backoffice widgets and key smoke paths
 - SDUI structure responses for selected backoffice pages
 

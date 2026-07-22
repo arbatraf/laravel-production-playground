@@ -34,6 +34,7 @@ Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when 
 - foundation E2E smoke covers the home page and API health route through Laravel's local server
 - operations domain tests cover role casts, company/contact/task/note relations, task status transitions, audit events, soft deletes, policy matrix and deterministic seeders
 - backoffice tests cover login, separate session guard, password revocation, role access, logout and branding
+- MoonShine resource tests cover registration, policy enforcement, role-based page access, menu visibility and protected write fields
 
 ## CI
 

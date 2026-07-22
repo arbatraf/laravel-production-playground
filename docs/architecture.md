@@ -21,6 +21,8 @@ Backoffice login does not create persistent remember-me cookies. Password change
 
 MoonShine resources and pages may display data, trigger handlers and call Laravel services, but they must not own business workflows.
 
+Task forms do not change status or completion fields; status transitions stay in `ChangeTaskStatusAction`. Task creators and note authors come from the authenticated backoffice user. Note subjects are selected on creation and are not changed through update forms.
+
 ## Operations Core
 
 Roles are stored as `UserRole` enum values on users. Policies own access decisions; role checks should not spread through controllers, resources or views.
