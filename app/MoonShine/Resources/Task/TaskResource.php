@@ -6,6 +6,8 @@ namespace App\MoonShine\Resources\Task;
 
 use App\Models\Task;
 use App\Models\User;
+use App\MoonShine\Resources\Concerns\AuditsResourceChanges;
+use App\MoonShine\Resources\Concerns\LimitsMassDeletion;
 use App\MoonShine\Resources\Task\Pages\TaskDetailPage;
 use App\MoonShine\Resources\Task\Pages\TaskFormPage;
 use App\MoonShine\Resources\Task\Pages\TaskIndexPage;
@@ -19,13 +21,15 @@ use MoonShine\Laravel\Resources\ModelResource;
  */
 final class TaskResource extends ModelResource
 {
+    use AuditsResourceChanges, LimitsMassDeletion;
+
     protected string $model = Task::class;
 
     protected string $title = 'Tasks';
 
     protected string $column = 'title';
 
-    protected array $with = ['company', 'contact', 'assignedTo', 'createdBy'];
+    protected array $with = ['company', 'contact', 'assignedTo'];
 
     protected bool $withPolicy = true;
 

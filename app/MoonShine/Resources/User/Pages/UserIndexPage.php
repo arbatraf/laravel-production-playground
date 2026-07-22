@@ -25,10 +25,10 @@ final class UserIndexPage extends IndexPage
     {
         return [
             ID::make()->sortable(),
-            Text::make('Name', 'name')->sortable(),
+            Text::make('Name', 'name'),
             Email::make('Email', 'email')->sortable(),
             Text::make('Role', 'role', static fn (User $user): string => $user->role->label()),
-            Date::make('Created', 'created_at')->format('Y-m-d H:i')->sortable(),
+            Date::make('Created', 'created_at')->format('Y-m-d H:i'),
         ];
     }
 }

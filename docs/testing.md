@@ -20,7 +20,7 @@ composer run analyse
 yarn test:e2e
 ```
 
-`phpunit.xml` uses an in-memory SQLite database for tests. Local development uses MySQL through `.env.example`.
+`phpunit.xml` targets the isolated MySQL database `laravel_production_playground_testing` and defaults local runs to the database-scoped `lpp_test` user. The base test case rejects any other database before migrations run. CI supplies a temporary MySQL database with the same name.
 
 Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when global CLI PHP differs.
 
@@ -29,16 +29,18 @@ Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when 
 - public foundation page loads
 - application name matches the project name
 - Laravel health route is available
-- API health/readiness endpoints report infrastructure status
+- health and readiness: infrastructure status, bearer authorization, fail-closed readiness and rate limits
+- response middleware: security headers, request IDs and the HSTS environment boundary
 - architecture guard suite covers Yarn commands, MoonShine 4 namespaces and debug helpers in production paths
 - foundation E2E smoke covers the home page and API health route through Laravel's local server
 - operations domain tests cover role casts, company/contact/task/note relations, task status transitions, audit events, soft deletes, policy matrix and deterministic seeders
-- backoffice tests cover login, separate session guard, password revocation, role access, logout and branding
-- MoonShine resource tests cover registration, policy enforcement, role-based page access, menu visibility and protected write fields
+- backoffice: login/logout auditing, separate session guard, password revocation, role access and branding
+- MoonShine resources: registration, policy enforcement, role-based page access, menu visibility, protected write fields, transactional CRUD auditing and the last-admin invariant
+- task Query Tags: aliases, icons, date/status boundaries, invalid-value fallback and backoffice authentication
 
 ## CI
 
-GitHub Actions runs the current checks on pushes to `main` and pull requests.
+GitHub Actions runs dependency audits, the current checks, the frontend build and the HTTP smoke test on pushes to `main` and pull requests.
 
 ## Planned Checks
 

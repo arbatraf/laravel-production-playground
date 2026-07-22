@@ -30,7 +30,7 @@ final class CompanyIndexPage extends IndexPage
             Text::make('Status', 'status', static fn (Company $company): string => $company->status->label()),
             Email::make('Email', 'email'),
             Text::make('Phone', 'phone'),
-            Date::make('Created', 'created_at')->format('Y-m-d H:i')->sortable(),
+            Date::make('Created', 'created_at')->format('Y-m-d H:i'),
         ];
     }
 }

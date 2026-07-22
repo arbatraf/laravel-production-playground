@@ -2,11 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AuditEventType;
 use App\Enums\UserRole;
+use App\Models\AuditEvent;
 use App\Models\User;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Cookie;
 use Tests\TestCase;
 
@@ -35,12 +42,23 @@ class BackofficeAccessTest extends TestCase
     {
         $user = User::factory()->admin()->create();
 
-        $this->post(route('moonshine.authenticate'), [
+        $response = $this->post(route('moonshine.authenticate'), [
             'username' => $user->email,
             'password' => 'password',
-        ])->assertRedirect(route('moonshine.index'));
+        ]);
+
+        $response->assertRedirect(route('moonshine.index'));
 
         $this->assertAuthenticatedAs($user, 'backoffice');
+
+        $event = AuditEvent::query()
+            ->where('event_type', AuditEventType::BackofficeLogin->value)
+            ->sole();
+
+        $this->assertTrue($event->user->is($user));
+        $this->assertTrue($event->subject->is($user));
+        $this->assertSame($response->headers->get('X-Request-ID'), $event->request_id);
+        $this->assertTrue(Str::isUuid($event->request_id));
     }
 
     public function test_invalid_password_does_not_open_backoffice(): void
@@ -53,6 +71,46 @@ class BackofficeAccessTest extends TestCase
         ])->assertSessionHasErrors('username');
 
         $this->assertGuest('backoffice');
+    }
+
+    public function test_unrelated_authentication_events_are_not_audited(): void
+    {
+        $user = User::factory()->admin()->create();
+
+        event(new Login('web', $user, false));
+        event(new Logout('web', $user));
+        event(new Lockout(Request::create('/login', 'POST')));
+
+        $this->assertDatabaseCount('audit_events', 0);
+    }
+
+    public function test_backoffice_lockout_audit_omits_the_submitted_email(): void
+    {
+        $user = User::factory()->admin()->create();
+        $payload = [
+            'username' => $user->email,
+            'password' => 'invalid-password',
+        ];
+
+        for ($attempt = 1; $attempt <= 5; $attempt++) {
+            $this->post(route('moonshine.authenticate'), $payload)
+                ->assertSessionHasErrors('username');
+        }
+
+        $response = $this->post(route('moonshine.authenticate'), $payload);
+
+        $response->assertSessionHasErrors('username');
+
+        $event = AuditEvent::query()
+            ->where('event_type', AuditEventType::BackofficeLockedOut->value)
+            ->sole();
+
+        $this->assertNull($event->user_id);
+        $this->assertNull($event->subject_type);
+        $this->assertNull($event->subject_id);
+        $this->assertSame(['guard' => 'backoffice'], $event->properties);
+        $this->assertSame($response->headers->get('X-Request-ID'), $event->request_id);
+        $this->assertStringNotContainsString($user->email, json_encode($event->toArray(), JSON_THROW_ON_ERROR));
     }
 
     public function test_backoffice_does_not_issue_remember_cookie(): void
@@ -129,10 +187,20 @@ class BackofficeAccessTest extends TestCase
     {
         $user = User::factory()->admin()->create();
 
-        $this->actingAs($user, 'backoffice')
-            ->delete(route('moonshine.logout'))
-            ->assertRedirect(route('moonshine.login'));
+        $response = $this->actingAs($user, 'backoffice')
+            ->delete(route('moonshine.logout'));
+
+        $response->assertRedirect(route('moonshine.login'));
 
         $this->assertGuest('backoffice');
+
+        $event = AuditEvent::query()
+            ->where('event_type', AuditEventType::BackofficeLogout->value)
+            ->sole();
+
+        $this->assertTrue($event->user->is($user));
+        $this->assertTrue($event->subject->is($user));
+        $this->assertSame($response->headers->get('X-Request-ID'), $event->request_id);
+        $this->assertTrue(Str::isUuid($event->request_id));
     }
 }

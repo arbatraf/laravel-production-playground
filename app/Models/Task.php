@@ -102,4 +102,25 @@ class Task extends Model
             TaskStatus::Waiting->value,
         ]);
     }
+
+    /**
+     * @param  Builder<Task>  $query
+     */
+    public function scopeOverdue(Builder $query): void
+    {
+        $query->open()->where('due_at', '<', now());
+    }
+
+    /**
+     * @param  Builder<Task>  $query
+     */
+    public function scopeDueToday(Builder $query): void
+    {
+        $today = now()->startOfDay();
+
+        $query
+            ->open()
+            ->where('due_at', '>=', $today)
+            ->where('due_at', '<', $today->copy()->addDay());
+    }
 }

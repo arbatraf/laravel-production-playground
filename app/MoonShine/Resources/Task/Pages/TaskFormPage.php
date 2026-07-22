@@ -12,12 +12,15 @@ use App\MoonShine\Fields\PlainTextarea;
 use App\MoonShine\Resources\Company\CompanyResource;
 use App\MoonShine\Resources\Contact\ContactResource;
 use App\MoonShine\Resources\Task\TaskResource;
+use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Validation\Rule;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\Fields\Relationships\BelongsTo;
+use MoonShine\Laravel\Http\Requests\Relations\RelationModelFieldRequest;
 use MoonShine\Laravel\Pages\Crud\FormPage;
 use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Fields\Date;
@@ -28,6 +31,8 @@ use MoonShine\UI\Fields\Select;
  */
 final class TaskFormPage extends FormPage
 {
+    private const int CONTACT_SEARCH_LIMIT = 100;
+
     /**
      * @return list<ComponentContract|FieldContract>
      */
@@ -47,7 +52,10 @@ final class TaskFormPage extends FormPage
                     'contact',
                     formatted: static fn (Contact $contact): string => trim("{$contact->first_name} {$contact->last_name}"),
                     resource: ContactResource::class,
-                )->asyncSearch('last_name')
+                )->associatedWith(
+                    'company_id',
+                    self::contactSearch(),
+                )
                     ->nullable(),
                 PlainText::make('Title', 'title')->required(),
                 PlainTextarea::make('Description', 'description')->nullable(),
@@ -59,6 +67,25 @@ final class TaskFormPage extends FormPage
                 Date::make('Due', 'due_at')->withTime()->nullable(),
             ]),
         ];
+    }
+
+    private static function contactSearch(): Closure
+    {
+        return static function (Builder $query, mixed $term, RelationModelFieldRequest $request): Builder {
+            if (! is_string($term) || strlen($term) > self::CONTACT_SEARCH_LIMIT) {
+                return $query->whereRaw('1 = 0');
+            }
+
+            $term = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $term);
+
+            return $query
+                ->without('company')
+                ->where('company_id', $request->integer('company_id'))
+                ->when(
+                    $term !== '',
+                    static fn (Builder $query): Builder => $query->whereLike('last_name', "{$term}%"),
+                );
+        };
     }
 
     protected function rules(DataWrapperContract $item): array

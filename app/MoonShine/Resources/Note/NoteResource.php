@@ -6,6 +6,8 @@ namespace App\MoonShine\Resources\Note;
 
 use App\Models\Note;
 use App\Models\User;
+use App\MoonShine\Resources\Concerns\AuditsResourceChanges;
+use App\MoonShine\Resources\Concerns\LimitsMassDeletion;
 use App\MoonShine\Resources\Note\Pages\NoteDetailPage;
 use App\MoonShine\Resources\Note\Pages\NoteFormPage;
 use App\MoonShine\Resources\Note\Pages\NoteIndexPage;
@@ -19,6 +21,8 @@ use MoonShine\Laravel\Resources\ModelResource;
  */
 final class NoteResource extends ModelResource
 {
+    use AuditsResourceChanges, LimitsMassDeletion;
+
     protected string $model = Note::class;
 
     protected string $title = 'Notes';

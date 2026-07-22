@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-backoffice--resources-blue)
+![Status](https://img.shields.io/badge/status-backoffice--quick--filters-blue)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: backoffice resources. Laravel 13/PHP 8.5, MoonShine 4, the CI quality gate and foundation E2E smoke are in place. Policy-backed resources expose users, companies, contacts, tasks, notes and audit events through the backoffice.
+Current stage: backoffice task quick filters. The MoonShine 4 backoffice exposes policy-backed users, companies, contacts, tasks, notes and audit events. Task filters: All, Overdue, Today and Done.
 
 Current interfaces: `/`, `/backoffice`, `/api/v1/health`, `/api/v1/health/readiness`.
 
@@ -36,7 +36,7 @@ Principle: simulated providers are fine; fake architecture is not.
 | Frontend | Blade, Vite, Yarn |
 | Quality | PHPUnit, Node test, Laravel Pint, PHPStan/Larastan level 6 |
 | Operations core | User roles, companies, contacts, tasks, notes, audit events, policies, factories, seeders |
-| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users and policy-backed resources |
+| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users, policy-backed resources and task quick filters |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
 | Planned reporting | ApexCharts, cached metrics, exports |
@@ -72,7 +72,7 @@ Delivery is slice-based: each feature combines schema, policy, service/action, A
 ## Planned Interfaces
 
 - Backoffice: `/backoffice`; demo accounts are available only in local and testing environments.
-- API: `/api/v1` starts with public health/readiness endpoints. Business endpoints arrive after the API foundation slice.
+- API: `/api/v1` starts with a public health endpoint and token-protected production readiness. Business endpoints arrive after the API foundation slice.
 - Demo users: `admin@example.com`, `manager@example.com`, `viewer@example.com`; password: `password`.
 
 ## Local Development
@@ -100,6 +100,14 @@ cp .env.example .env
 yarn dev
 ```
 
+Create the isolated test database once before running the PHP quality gate:
+
+```sql
+CREATE DATABASE laravel_production_playground_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS 'lpp_test'@'127.0.0.1' IDENTIFIED BY '';
+GRANT ALL PRIVILEGES ON laravel_production_playground_testing.* TO 'lpp_test'@'127.0.0.1';
+```
+
 The default `.env.example` uses MySQL and the local Valet-friendly URL `http://lpp.test`.
 Local CLI PHP is pinned to `php@8.5` in `.valetrc`. Use `./scripts/php` and `./scripts/composer`.
 
@@ -110,12 +118,14 @@ Docker stays optional. Valet and Homebrew remain the primary local path.
 Checks:
 
 ```bash
+composer audit --locked --abandoned=fail
 composer run check
+yarn audit --level high
 yarn build
 yarn test:e2e
 ```
 
-CI runs Composer validation, Pint, PHPStan/Larastan level 6, PHPUnit and `yarn build`.
+CI runs dependency audits, `composer run check`, `yarn build` and `yarn test:e2e`.
 
 Playwright will be added when browser smoke coverage lands. Current E2E smoke uses Node test.
 
@@ -129,13 +139,14 @@ Current coverage:
 - operations model: roles, companies, contacts, tasks, notes, policies, factories and seeders
 - audit event writer, task status audit, policy access and soft-deleted subject context
 - MoonShine login, separate backoffice session, branding and policy-backed resources for users, companies, contacts, tasks, notes and audit events
+- MoonShine task Query Tags: All, Overdue, Today and Done
 
 Planned coverage:
 
 - services and value objects
 - API and webhooks
 - imports, payments and communication workflows
-- MoonShine handlers, query tags and metrics
+- MoonShine handlers and metrics
 - Livewire/Alpine backoffice widgets and key smoke paths
 - SDUI structure responses for selected backoffice pages
 

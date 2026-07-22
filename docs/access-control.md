@@ -25,6 +25,9 @@ MoonShine navigation follows each resource's `viewAny` ability. Hidden menu item
 
 Manager and Viewer retain the domain-level ability to view themselves, but the MoonShine user resource is unavailable because `viewAny` is admin-only.
 
-`massDelete` is admin-only for operations records. Users cannot be mass deleted.
+`massDelete` is admin-only for operations records, limited to 100 records per request and uses the standard resource delete and audit path. Users cannot be mass deleted.
+
+User writes run through MoonShine save and destroy handlers. The final `Admin` cannot be demoted or deleted. Transactions lock the fresh actor and target; self-demotion also locks one remaining administrator.
+The handlers authorize the fresh actor and target through `UserPolicy`. Direct model, Builder and raw SQL mutations are outside this application boundary and must not be used for production runtime user writes; seeders and migrations remain explicit maintenance paths.
 
 Authorize task status changes through the task `update` policy before calling the status action.

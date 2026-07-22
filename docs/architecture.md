@@ -17,7 +17,7 @@ Business behavior stays in Laravel code that can be tested without the admin UI:
 
 MoonShine 4 is the backoffice UI layer at `/backoffice`. It uses a separate session guard with the existing `User` model. Admin, Manager and Viewer may enter the panel; resource policies define record access.
 
-Backoffice login does not create persistent remember-me cookies. Password changes invalidate active backoffice sessions.
+Backoffice login does not create persistent remember-me cookies. Password changes invalidate active backoffice sessions. Login, logout, lockout and resource writes create audit events.
 
 MoonShine resources and pages may display data, trigger handlers and call Laravel services, but they must not own business workflows.
 
@@ -31,7 +31,9 @@ Companies, contacts, tasks and notes use soft deletes. Contacts keep archived co
 
 Task status uses `TaskStatus`. `ChangeTaskStatusAction` sets `completed_at` for closed statuses and blocks transitions out of them.
 
-Audit events are written through `RecordAuditEventAction`. The first recorded workflow event is `task.status_changed`.
+Audit events are written through `RecordAuditEventAction`. Backoffice resource writes and their audit rows share a transaction.
+
+Application responses include security headers and an `X-Request-ID`. Valid upstream UUIDs are preserved; other values are replaced. Health is limited to 60 requests per minute per IP. Production readiness is limited to 12, requires a bearer token of at least 32 characters and returns 503 when the token is missing.
 
 ## Delivery
 

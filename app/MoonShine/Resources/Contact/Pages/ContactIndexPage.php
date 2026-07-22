@@ -31,7 +31,7 @@ final class ContactIndexPage extends IndexPage
             Email::make('Email', 'email'),
             Text::make('Phone', 'phone'),
             Text::make('Position', 'position'),
-            Date::make('Created', 'created_at')->format('Y-m-d H:i')->sortable(),
+            Date::make('Created', 'created_at')->format('Y-m-d H:i'),
         ];
     }
 }

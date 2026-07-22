@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Contact;
 
 use App\Models\Contact;
+use App\MoonShine\Resources\Concerns\AuditsResourceChanges;
+use App\MoonShine\Resources\Concerns\LimitsMassDeletion;
 use App\MoonShine\Resources\Contact\Pages\ContactDetailPage;
 use App\MoonShine\Resources\Contact\Pages\ContactFormPage;
 use App\MoonShine\Resources\Contact\Pages\ContactIndexPage;
@@ -15,6 +17,8 @@ use MoonShine\Laravel\Resources\ModelResource;
  */
 final class ContactResource extends ModelResource
 {
+    use AuditsResourceChanges, LimitsMassDeletion;
+
     protected string $model = Contact::class;
 
     protected string $title = 'Contacts';

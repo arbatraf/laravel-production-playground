@@ -30,7 +30,7 @@ final class NoteIndexPage extends IndexPage
             Text::make('Subject', 'notable_id', static fn (Note $note): string => self::subjectLabel($note)),
             Text::make('Author', 'author_id', static fn (Note $note): string => (string) data_get($note->author, 'name', '')),
             Text::make('Body', 'body'),
-            Date::make('Created', 'created_at')->format('Y-m-d H:i')->sortable(),
+            Date::make('Created', 'created_at')->format('Y-m-d H:i'),
         ];
     }
 

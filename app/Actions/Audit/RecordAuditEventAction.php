@@ -10,21 +10,16 @@ use InvalidArgumentException;
 
 final readonly class RecordAuditEventAction
 {
-    private const array SENSITIVE_PROPERTY_KEYS = [
-        'access_token',
-        'api_key',
+    private const array SENSITIVE_PROPERTY_KEY_PARTS = [
         'apikey',
         'authorization',
         'bearer',
         'body',
-        'client_secret',
         'cookie',
         'headers',
         'password',
         'payload',
-        'private_key',
-        'raw_payload',
-        'refresh_token',
+        'privatekey',
         'request',
         'secret',
         'token',
@@ -100,7 +95,7 @@ final readonly class RecordAuditEventAction
                 throw new InvalidArgumentException('Audit property key is invalid.');
             }
 
-            if (in_array(strtolower($key), self::SENSITIVE_PROPERTY_KEYS, true)) {
+            if ($this->isSensitivePropertyKey($key)) {
                 throw new InvalidArgumentException('Audit property key is sensitive.');
             }
 
@@ -112,5 +107,21 @@ final readonly class RecordAuditEventAction
         }
 
         return $normalized;
+    }
+
+    private function isSensitivePropertyKey(string $key): bool
+    {
+        $snakeKey = preg_replace('/(?<=[a-z0-9])(?=[A-Z])/', '_', $key);
+        $snakeKey = preg_replace('/[^a-z0-9]+/i', '_', $snakeKey ?? '');
+        $snakeKey = strtolower(trim($snakeKey ?? '', '_'));
+        $compactKey = str_replace('_', '', $snakeKey);
+
+        foreach (self::SENSITIVE_PROPERTY_KEY_PARTS as $sensitiveKeyPart) {
+            if (str_contains($compactKey, $sensitiveKeyPart)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
