@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+set -eu
+
+ROOT_DIR="$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)"
+TEST_DATABASE="laravel_production_playground_testing"
+TEST_HOST="127.0.0.1"
+TEST_PORT="3306"
+CONFIGURED_DATABASE="${DB_DATABASE:-$TEST_DATABASE}"
+CONFIGURED_HOST="${DB_HOST:-$TEST_HOST}"
+CONFIGURED_PORT="${DB_PORT:-$TEST_PORT}"
+
+if [ "$CONFIGURED_DATABASE" != "$TEST_DATABASE" ] \
+    || [ "$CONFIGURED_HOST" != "$TEST_HOST" ] \
+    || [ "$CONFIGURED_PORT" != "$TEST_PORT" ]; then
+    echo "Browser tests require the local isolated MySQL testing database." >&2
+    exit 1
+fi
+
+cd "$ROOT_DIR"
+
+export APP_ENV=testing
+export APP_DEBUG=false
+export APP_URL="http://127.0.0.1:${PLAYWRIGHT_PORT:-8017}"
+export DB_CONNECTION=mysql
+export DB_HOST="$TEST_HOST"
+export DB_PORT="$TEST_PORT"
+export DB_DATABASE="$TEST_DATABASE"
+export DB_USERNAME="${DB_USERNAME:-lpp_test}"
+export DB_PASSWORD="${DB_PASSWORD:-}"
+export DB_URL=""
+export DB_SOCKET=""
+export BCRYPT_ROUNDS=4
+export CACHE_STORE=array
+export QUEUE_CONNECTION=sync
+export SESSION_DRIVER=database
+export SESSION_CONNECTION=mysql
+export SESSION_COOKIE=lpp_e2e_session
+export MAIL_MAILER=array
+
+./scripts/php artisan config:clear --no-interaction
+./scripts/php scripts/assert-testing-database.php
+./scripts/php artisan migrate:fresh --seed --force --no-interaction
+
+exec ./node_modules/.bin/playwright test

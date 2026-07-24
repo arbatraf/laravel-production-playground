@@ -29,7 +29,7 @@ Roles are stored as `UserRole` enum values on users. Policies own access decisio
 
 Companies, contacts, tasks and notes use soft deletes. Contacts keep archived company context. Tasks keep archived company/contact context. Notes may attach to companies, contacts or tasks.
 
-Task status uses `TaskStatus`. `ChangeTaskStatusAction` sets `completed_at` for closed statuses and blocks transitions out of them.
+Task status uses `TaskStatus`. MoonShine handlers validate the task ID and select the target status server-side. `ChangeTaskStatusAction` reloads and locks the actor and task, authorizes the transition, sets `completed_at` for closed statuses and blocks transitions out of them.
 
 Audit events are written through `RecordAuditEventAction`. Backoffice resource writes and their audit rows share a transaction.
 

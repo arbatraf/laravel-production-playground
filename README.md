@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-backoffice--quick--filters-blue)
+![Status](https://img.shields.io/badge/status-backoffice--action--handlers-blue)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: backoffice task quick filters. The MoonShine 4 backoffice exposes policy-backed users, companies, contacts, tasks, notes and audit events. Task filters: All, Overdue, Today and Done.
+Current stage: backoffice task action handlers. The MoonShine 4 backoffice exposes policy-backed users, companies, contacts, tasks, notes and audit events. Each handler authorizes the request, updates the task in a transaction and writes an audit event.
 
 Current interfaces: `/`, `/backoffice`, `/api/v1/health`, `/api/v1/health/readiness`.
 
@@ -34,13 +34,13 @@ Principle: simulated providers are fine; fake architecture is not.
 | --- | --- |
 | Backend | PHP 8.5, Laravel 13, MySQL |
 | Frontend | Blade, Vite, Yarn |
-| Quality | PHPUnit, Node test, Laravel Pint, PHPStan/Larastan level 6 |
+| Quality | PHPUnit, Node test, Playwright, Laravel Pint, PHPStan/Larastan level 6 |
 | Operations core | User roles, companies, contacts, tasks, notes, audit events, policies, factories, seeders |
-| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users, policy-backed resources and task quick filters |
+| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users, policy-backed resources, task quick filters and task status handlers |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
 | Planned reporting | ApexCharts, cached metrics, exports |
-| Planned delivery | Playwright, release artifacts, deploy dry run |
+| Planned delivery | Release artifacts, deploy dry run |
 
 ## Architecture
 
@@ -127,7 +127,7 @@ yarn test:e2e
 
 CI runs dependency audits, `composer run check`, `yarn build` and `yarn test:e2e`.
 
-Playwright will be added when browser smoke coverage lands. Current E2E smoke uses Node test.
+The E2E suite combines the Node HTTP smoke with a Playwright backoffice smoke against the isolated testing database.
 
 Current coverage:
 
@@ -140,13 +140,15 @@ Current coverage:
 - audit event writer, task status audit, policy access and soft-deleted subject context
 - MoonShine login, separate backoffice session, branding and policy-backed resources for users, companies, contacts, tasks, notes and audit events
 - MoonShine task Query Tags: All, Overdue, Today and Done
+- MoonShine task status handlers: policy checks, POST-only requests, transition rules, row actions, audit events and concurrency locks
+- Playwright backoffice smoke: login, CSRF rejection, direct task transition, terminal confirmation and async table refresh
 
 Planned coverage:
 
 - services and value objects
 - API and webhooks
 - imports, payments and communication workflows
-- MoonShine handlers and metrics
+- MoonShine metrics
 - Livewire/Alpine backoffice widgets and key smoke paths
 - SDUI structure responses for selected backoffice pages
 

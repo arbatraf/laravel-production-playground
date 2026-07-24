@@ -12,8 +12,10 @@ use App\Models\AuditEvent;
 use App\Models\Company;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use InvalidArgumentException;
+use RuntimeException;
 use Tests\TestCase;
 
 class AuditEventTest extends TestCase
@@ -172,7 +174,7 @@ class AuditEventTest extends TestCase
         $manager = User::factory()->manager()->create();
         $task = Task::factory()->inProgress()->create();
 
-        $task = (new ChangeTaskStatusAction)(
+        $task = app(ChangeTaskStatusAction::class)(
             task: $task,
             status: TaskStatus::Done,
             user: $manager,
@@ -197,9 +199,10 @@ class AuditEventTest extends TestCase
 
     public function test_task_status_noop_does_not_record_audit_event(): void
     {
+        $manager = User::factory()->manager()->create();
         $task = Task::factory()->create();
 
-        (new ChangeTaskStatusAction)($task, TaskStatus::Open);
+        app(ChangeTaskStatusAction::class)($task, TaskStatus::Open, $manager);
 
         $this->assertDatabaseCount('audit_events', 0);
     }
@@ -217,15 +220,92 @@ class AuditEventTest extends TestCase
 
     public function test_invalid_task_status_transition_does_not_record_audit_event(): void
     {
+        $manager = User::factory()->manager()->create();
         $task = Task::factory()->done()->create();
 
         try {
-            (new ChangeTaskStatusAction)($task, TaskStatus::InProgress);
+            app(ChangeTaskStatusAction::class)($task, TaskStatus::InProgress, $manager);
             $this->fail('Invalid transition was accepted.');
         } catch (InvalidArgumentException $e) {
             $this->assertSame('Invalid task status transition.', $e->getMessage());
         }
 
+        $this->assertDatabaseCount('audit_events', 0);
+    }
+
+    public function test_stale_task_status_cannot_overwrite_a_closed_task(): void
+    {
+        $manager = User::factory()->manager()->create();
+        $submittedTask = Task::factory()->create();
+        $completedAt = now();
+
+        Task::query()
+            ->whereKey($submittedTask->getKey())
+            ->update([
+                'status' => TaskStatus::Done->value,
+                'completed_at' => $completedAt,
+            ]);
+
+        $this->assertThrows(
+            fn (): Task => app(ChangeTaskStatusAction::class)($submittedTask, TaskStatus::Waiting, $manager),
+            InvalidArgumentException::class,
+            'Invalid task status transition.',
+        );
+
+        $task = $submittedTask->fresh();
+
+        $this->assertSame(TaskStatus::Done, $task->status);
+        $this->assertNotNull($task->completed_at);
+        $this->assertDatabaseCount('audit_events', 0);
+    }
+
+    public function test_replayed_task_status_change_records_one_audit_event(): void
+    {
+        $manager = User::factory()->manager()->create();
+        $submittedTask = Task::factory()->create();
+        $action = app(ChangeTaskStatusAction::class);
+
+        $firstResult = $action($submittedTask, TaskStatus::InProgress, $manager, 'req-task-replay');
+        $secondResult = $action($submittedTask, TaskStatus::InProgress, $manager, 'req-task-replay');
+
+        $this->assertNotSame($submittedTask, $firstResult);
+        $this->assertNotSame($firstResult, $secondResult);
+        $this->assertSame(TaskStatus::InProgress, $secondResult->status);
+        $this->assertDatabaseCount('audit_events', 1);
+    }
+
+    public function test_task_status_noop_still_requires_update_access(): void
+    {
+        $viewer = User::factory()->viewer()->create();
+        $task = Task::factory()->create();
+
+        $this->assertThrows(
+            fn (): Task => app(ChangeTaskStatusAction::class)($task, TaskStatus::Open, $viewer),
+            AuthorizationException::class,
+        );
+
+        $this->assertDatabaseCount('audit_events', 0);
+    }
+
+    public function test_task_status_change_rolls_back_when_audit_write_fails(): void
+    {
+        $manager = User::factory()->manager()->create();
+        $task = Task::factory()->inProgress()->create();
+
+        AuditEvent::creating(static function (): never {
+            throw new RuntimeException('Audit storage unavailable.');
+        });
+
+        $this->assertThrows(
+            fn (): Task => app(ChangeTaskStatusAction::class)($task, TaskStatus::Done, $manager),
+            RuntimeException::class,
+            'Audit storage unavailable.',
+        );
+
+        $task = $task->fresh();
+
+        $this->assertSame(TaskStatus::InProgress, $task->status);
+        $this->assertNull($task->completed_at);
         $this->assertDatabaseCount('audit_events', 0);
     }
 

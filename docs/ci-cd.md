@@ -20,7 +20,7 @@ yarn test:e2e
 
 Workflow actions are pinned to full commit SHAs. The job has a 15-minute timeout, and a newer run cancels an older run for the same branch.
 
-The CI job uses a temporary MySQL service and `.env.example`; repository secrets are not required.
+The CI job uses a temporary MySQL service and `.env.example`, installs Chromium for Playwright and does not require repository secrets.
 
 ## Repository Settings
 

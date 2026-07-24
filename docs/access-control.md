@@ -30,4 +30,4 @@ Manager and Viewer retain the domain-level ability to view themselves, but the M
 User writes run through MoonShine save and destroy handlers. The final `Admin` cannot be demoted or deleted. Transactions lock the fresh actor and target; self-demotion also locks one remaining administrator.
 The handlers authorize the fresh actor and target through `UserPolicy`. Direct model, Builder and raw SQL mutations are outside this application boundary and must not be used for production runtime user writes; seeders and migrations remain explicit maintenance paths.
 
-Authorize task status changes through the task `update` policy before calling the status action.
+Task status handlers are available to Admin and Manager through the task `update` policy. Each request reloads and locks the actor and task before policy authorization. Viewer requests and invalid transitions do not write audit events.

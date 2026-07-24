@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions\Tasks;
 
 use App\Actions\Audit\RecordAuditEventAction;
@@ -7,40 +9,48 @@ use App\Enums\AuditEventType;
 use App\Enums\TaskStatus;
 use App\Models\Task;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use InvalidArgumentException;
 
 final readonly class ChangeTaskStatusAction
 {
-    private RecordAuditEventAction $recordAuditEvent;
+    public function __construct(private RecordAuditEventAction $recordAuditEvent) {}
 
-    public function __construct(?RecordAuditEventAction $recordAuditEvent = null)
+    public function __invoke(Task $task, TaskStatus $status, User $user, ?string $requestId = null): Task
     {
-        $this->recordAuditEvent = $recordAuditEvent ?? new RecordAuditEventAction;
-    }
+        $taskId = $task->getKey();
+        $userId = $user->getKey();
 
-    public function __invoke(Task $task, TaskStatus $status, ?User $user = null, ?string $requestId = null): Task
-    {
-        if (! $task->status->canTransitionTo($status)) {
-            throw new InvalidArgumentException('Invalid task status transition.');
-        }
+        return $task->getConnection()->transaction(function () use ($task, $taskId, $status, $userId, $requestId): Task {
+            $actor = User::query()
+                ->lockForUpdate()
+                ->findOrFail($userId);
 
-        if ($task->status === $status) {
-            return $task;
-        }
+            $task = $task->newQuery()
+                ->lockForUpdate()
+                ->findOrFail($taskId);
 
-        $fromStatus = $task->status;
+            Gate::forUser($actor)->authorize('update', $task);
 
-        return DB::transaction(function () use ($task, $status, $user, $requestId, $fromStatus): Task {
+            if ($task->status === $status) {
+                return $task;
+            }
+
+            if (! $task->status->canTransitionTo($status)) {
+                throw new InvalidArgumentException('Invalid task status transition.');
+            }
+
+            $fromStatus = $task->status;
+
             $task->forceFill([
                 'status' => $status,
                 'completed_at' => $status->isClosed() ? now() : null,
-            ])->save();
+            ])->saveOrFail();
 
             ($this->recordAuditEvent)(
                 eventType: AuditEventType::TaskStatusChanged,
                 description: sprintf('Task status changed from %s to %s.', $fromStatus->value, $status->value),
-                user: $user,
+                user: $actor,
                 subject: $task,
                 properties: [
                     'from_status' => $fromStatus->value,
@@ -49,7 +59,7 @@ final readonly class ChangeTaskStatusAction
                 requestId: $requestId,
             );
 
-            return $task->refresh();
-        });
+            return $task;
+        }, 3);
     }
 }

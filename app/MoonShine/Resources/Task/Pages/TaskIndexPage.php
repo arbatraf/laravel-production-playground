@@ -6,12 +6,16 @@ namespace App\MoonShine\Resources\Task\Pages;
 
 use App\Enums\TaskStatus;
 use App\Models\Task;
+use App\MoonShine\Handlers\ChangeTaskStatusHandler;
 use App\MoonShine\Resources\Task\TaskResource;
 use Illuminate\Database\Eloquent\Builder;
+use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Contracts\UI\FieldContract;
+use MoonShine\Crud\Handlers\Handler;
 use MoonShine\Crud\QueryTags\QueryTag as BaseQueryTag;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Laravel\QueryTags\QueryTag;
+use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Fields\Text;
@@ -21,6 +25,30 @@ use MoonShine\UI\Fields\Text;
  */
 final class TaskIndexPage extends IndexPage
 {
+    /**
+     * @return ListOf<Handler>
+     */
+    protected function handlers(): ListOf
+    {
+        return new ListOf(Handler::class, [
+            (new ChangeTaskStatusHandler('Reopen', TaskStatus::Open))->alias('task-open'),
+            (new ChangeTaskStatusHandler('Start', TaskStatus::InProgress))->alias('task-start'),
+            (new ChangeTaskStatusHandler('Wait', TaskStatus::Waiting))->alias('task-wait'),
+            (new ChangeTaskStatusHandler('Complete', TaskStatus::Done))->alias('task-complete'),
+            (new ChangeTaskStatusHandler('Cancel', TaskStatus::Canceled))->alias('task-cancel'),
+        ]);
+    }
+
+    /**
+     * @return ListOf<ActionButtonContract>
+     */
+    protected function buttons(): ListOf
+    {
+        return parent::buttons()->add(
+            ...$this->getHandlers()->getButtons()->toArray(),
+        );
+    }
+
     /**
      * @return list<BaseQueryTag>
      */

@@ -9,9 +9,12 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "test:e2e": "node --test tests/e2e/*.test.mjs"
+        "test:http": "node --test tests/e2e/*.test.mjs",
+        "test:browser": "./scripts/test-browser",
+        "test:e2e": "yarn test:http && yarn test:browser"
     },
     "devDependencies": {
+        "@playwright/test": "1.61.1",
         "concurrently": "^9.0.1",
         "laravel-vite-plugin": "^3.1",
         "vite": "^8.0.0"
