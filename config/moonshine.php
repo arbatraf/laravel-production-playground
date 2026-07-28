@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Middleware\AuthenticateBackofficeSession;
 use App\Http\Middleware\EnsureBackofficeAccess;
+use App\Http\Middleware\RestrictMoonShineStructureRequests;
 use App\Models\User;
 use App\MoonShine\Auth\DisableRememberMe;
 use App\MoonShine\Forms\LoginForm;
@@ -66,6 +67,7 @@ return [
             Authenticate::class,
             AuthenticateBackofficeSession::class,
             EnsureBackofficeAccess::class,
+            RestrictMoonShineStructureRequests::class,
         ],
         'pipelines' => [
             DisableRememberMe::class,

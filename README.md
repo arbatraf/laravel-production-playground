@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-backoffice--action--handlers-blue)
+![Status](https://img.shields.io/badge/status-moonshine--sdui--structure-blue)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,9 +14,9 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: backoffice task action handlers. The MoonShine 4 backoffice exposes policy-backed users, companies, contacts, tasks, notes and audit events. Each handler authorizes the request, updates the task in a transaction and writes an audit event.
+Current stage: v0.4.4 - MoonShine 4 SDUI structure demo. The authenticated Dashboard exposes its native structure while resource page structures remain blocked.
 
-Current interfaces: `/`, `/backoffice`, `/api/v1/health`, `/api/v1/health/readiness`.
+Current interfaces: `/`, `/backoffice`, `/backoffice/page/dashboard`, `/api/v1/health`, `/api/v1/health/readiness`.
 
 ## About
 
@@ -36,7 +36,7 @@ Principle: simulated providers are fine; fake architecture is not.
 | Frontend | Blade, Vite, Yarn |
 | Quality | PHPUnit, Node test, Playwright, Laravel Pint, PHPStan/Larastan level 6 |
 | Operations core | User roles, companies, contacts, tasks, notes, audit events, policies, factories, seeders |
-| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users, policy-backed resources, task quick filters and task status handlers |
+| Backoffice | MoonShine 4, branded `/backoffice`, Laravel users, policy-backed resources, task quick filters, task status handlers and Dashboard SDUI structure |
 | Planned API/auth | REST API v1, Laravel Sanctum, policies, gates |
 | Planned async | queues, jobs, events, listeners, scheduler |
 | Planned reporting | ApexCharts, cached metrics, exports |
@@ -74,6 +74,25 @@ Delivery is slice-based: each feature combines schema, policy, service/action, A
 - Backoffice: `/backoffice`; demo accounts are available only in local and testing environments.
 - API: `/api/v1` starts with a public health endpoint and token-protected production readiness. Business endpoints arrive after the API foundation slice.
 - Demo users: `admin@example.com`, `manager@example.com`, `viewer@example.com`; password: `password`.
+
+## MoonShine SDUI Structure
+
+The native MoonShine 4 structure response is available only for the authenticated Dashboard:
+
+```bash
+curl -b cookies.txt \
+  -H 'Accept: application/json' \
+  -H 'X-MS-Structure: true' \
+  http://lpp.test/backoffice/page/dashboard
+```
+
+Supported variants:
+
+- `X-MS-Without-States: true`
+- `X-MS-Only-Layout: true`
+- `X-MS-Without-Layout: true`
+
+Resource page structure requests return `403`. Regular HTML resource pages keep their policy-based access. The SDUI response is a MoonShine presentation contract, not the future REST API.
 
 ## Local Development
 
@@ -142,6 +161,7 @@ Current coverage:
 - MoonShine task Query Tags: All, Overdue, Today and Done
 - MoonShine task status handlers: policy checks, POST-only requests, transition rules, row actions, audit events and concurrency locks
 - Playwright backoffice smoke: login, CSRF rejection, direct task transition, terminal confirmation and async table refresh
+- MoonShine Dashboard SDUI structure: backoffice authentication, variants, policy-filtered layout, private caching and resource denial
 
 Planned coverage:
 
@@ -150,7 +170,6 @@ Planned coverage:
 - imports, payments and communication workflows
 - MoonShine metrics
 - Livewire/Alpine backoffice widgets and key smoke paths
-- SDUI structure responses for selected backoffice pages
 
 ## Documentation
 

@@ -41,6 +41,7 @@ Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when 
 - task Query Tags: aliases, icons, date/status boundaries, invalid-value fallback and backoffice authentication
 - task status handlers: role access, POST-only requests, task ID validation, server-selected targets, transition matrix, idempotency, rollback on audit failure and concurrent writes
 - browser smoke: backoffice login, CSRF rejection, direct task transition, terminal confirmation and async table refresh
+- MoonShine Dashboard SDUI: guard isolation, response variants, policy-filtered layout, cache headers and resource structure denial
 
 ## CI
 

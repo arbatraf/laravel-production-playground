@@ -6,6 +6,8 @@ Admin, Manager and Viewer may enter `/backoffice`. Resource access remains polic
 
 MoonShine navigation follows each resource's `viewAny` ability. Hidden menu items do not replace route authorization.
 
+SDUI structure requests require the backoffice guard and are allowed only for `/backoffice/page/dashboard`. All resource page structure requests return `403`, including requests from Admin. Regular HTML resource pages keep the policy matrix below.
+
 ## Roles
 
 - `Admin` manages operations records and users, except bulk or hard user deletion.

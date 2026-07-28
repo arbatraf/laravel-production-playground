@@ -21,6 +21,8 @@ Backoffice login does not create persistent remember-me cookies. Password change
 
 MoonShine resources and pages may display data, trigger handlers and call Laravel services, but they must not own business workflows.
 
+MoonShine SDUI is limited to the authenticated Dashboard. It is a presentation and inspection surface, not the REST API contract. Resource page structures are blocked because MoonShine 4.18.1 serializes them outside the normal page render authorization path.
+
 Task forms do not change status or completion fields; status transitions stay in `ChangeTaskStatusAction`. Task creators and note authors come from the authenticated backoffice user. Note subjects are selected on creation and are not changed through update forms.
 
 ## Operations Core
