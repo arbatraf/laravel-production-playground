@@ -1,20 +1,7 @@
 import { expect, test } from '@playwright/test';
+import { backofficeUrls, loginBackoffice } from './support/backoffice.mjs';
 
-const tasksUrl = '/backoffice/resource/task-resource/task-index-page';
-
-async function login(page) {
-    await page.goto('/backoffice/login');
-    await page.getByRole('textbox', { name: 'Email *', exact: true }).fill('admin@example.com');
-    await page.getByRole('textbox', { name: 'Password *', exact: true }).fill('password');
-
-    await Promise.all([
-        page.waitForURL('/backoffice'),
-        page.getByRole('button', { name: 'Log in', exact: true }).click(),
-    ]);
-
-    await page.goto(tasksUrl);
-    await expect(page.getByRole('heading', { name: 'Tasks', exact: true })).toBeVisible();
-}
+test.describe.configure({ retries: 0 });
 
 function taskRow(page, title) {
     return page.locator('tbody tr').filter({ hasText: title });
@@ -28,7 +15,9 @@ async function openActions(row) {
 }
 
 test.beforeEach(async ({ page }) => {
-    await login(page);
+    await loginBackoffice(page, 'admin@example.com');
+    await page.goto(backofficeUrls.tasks);
+    await expect(page.getByRole('heading', { name: 'Tasks', exact: true })).toBeVisible();
 });
 
 test('direct status action enforces CSRF and refreshes the row', async ({ page }) => {
@@ -43,7 +32,7 @@ test('direct status action enforces CSRF and refreshes the row', async ({ page }
     expect(href).not.toBeNull();
 
     const actionUrl = new URL(href, page.url()).toString();
-    const authenticated = await page.context().request.get(tasksUrl, {
+    const authenticated = await page.context().request.get(backofficeUrls.tasks, {
         maxRedirects: 0,
     });
 

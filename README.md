@@ -5,7 +5,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 ![PHP](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
 ![Laravel](https://img.shields.io/badge/Laravel-13-FF2D20?logo=laravel&logoColor=white)
 ![MoonShine](https://img.shields.io/badge/MoonShine-4-6B46C1)
-![Status](https://img.shields.io/badge/status-moonshine--sdui--structure-blue)
+![Status](https://img.shields.io/badge/status-backoffice--smoke--tests-blue)
 ![License](https://img.shields.io/badge/license-portfolio--only-orange)
 
 > This repository is a technical showcase only.
@@ -14,7 +14,7 @@ Laravel 13 portfolio project about business backoffice systems, API design, queu
 
 ## Status
 
-Current stage: v0.4.4 - MoonShine 4 SDUI structure demo. The authenticated Dashboard exposes its native structure while resource page structures remain blocked.
+Current stage: v0.4.5 - backoffice smoke tests. Playwright checks the guest login redirect, role-based resource page access and task status actions.
 
 Current interfaces: `/`, `/backoffice`, `/backoffice/page/dashboard`, `/api/v1/health`, `/api/v1/health/readiness`.
 
@@ -160,7 +160,7 @@ Current coverage:
 - MoonShine login, separate backoffice session, branding and policy-backed resources for users, companies, contacts, tasks, notes and audit events
 - MoonShine task Query Tags: All, Overdue, Today and Done
 - MoonShine task status handlers: policy checks, POST-only requests, transition rules, row actions, audit events and concurrency locks
-- Playwright backoffice smoke: login, CSRF rejection, direct task transition, terminal confirmation and async table refresh
+- Playwright backoffice smoke: guest login redirect; Admin access to company, task and user pages; Manager access to the task list and create page, with user pages denied; Viewer access to company and task lists, with task creation and user pages denied; CSRF rejection, task transitions and async table refresh
 - MoonShine Dashboard SDUI structure: backoffice authentication, variants, policy-filtered layout, private caching and resource denial
 
 Planned coverage:

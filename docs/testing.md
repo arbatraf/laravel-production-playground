@@ -40,7 +40,7 @@ Composer scripts use `./scripts/php`, so Laravel tools run on PHP 8.5 even when 
 - MoonShine resources: registration, policy enforcement, role-based page access, menu visibility, protected write fields, transactional CRUD auditing and the last-admin invariant
 - task Query Tags: aliases, icons, date/status boundaries, invalid-value fallback and backoffice authentication
 - task status handlers: role access, POST-only requests, task ID validation, server-selected targets, transition matrix, idempotency, rollback on audit failure and concurrent writes
-- browser smoke: backoffice login, CSRF rejection, direct task transition, terminal confirmation and async table refresh
+- browser smoke: guest login redirect; Admin access to company, task and user pages; Manager access to the task list and create page, with user pages denied; Viewer access to company and task lists, with task creation and user pages denied; CSRF rejection, task transitions and async table refresh
 - MoonShine Dashboard SDUI: guard isolation, response variants, policy-filtered layout, cache headers and resource structure denial
 
 ## CI
